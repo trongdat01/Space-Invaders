@@ -46,9 +46,13 @@ let buff = null;
 let buffVelocityY = 2;
 let buffActive = false;
 let buffExists = false;
+let buffType = null;
 
 let score = 0;
 let gameOver = false;
+
+//thêm biến cho background
+let backgroundImg;
 
 window.onload = function() {
     board = document.getElementById("board");
@@ -66,6 +70,10 @@ window.onload = function() {
     alienImg.src = "./alien.png";
     createAliens();
 
+    //thêm load ảnh background
+    backgroundImg = new Image();
+    backgroundImg.src = "./background.png"; // Thay đổi đường dẫn đến file ảnh của bạn
+
     requestAnimationFrame(update);
     document.addEventListener("keydown", moveShip);
     document.addEventListener("keyup", shoot);
@@ -77,6 +85,9 @@ function update() {
     if (gameOver) return;
 
     context.clearRect(0, 0, board.width, board.height);
+    
+    //vẽ background trước khi vẽ các đối tượng khác
+    context.drawImage(backgroundImg, 0, 0, board.width, board.height);
 
     context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
 
@@ -122,7 +133,7 @@ function update() {
 
     if (buff) {
         buff.y += buffVelocityY;
-        context.fillStyle = "yellow";
+        context.fillStyle = buffType === "slow" ? "yellow" : "green";
         context.fillRect(buff.x, buff.y, buff.width, buff.height);
 
         if (detectCollision(ship, buff)) activateBuff();
@@ -179,14 +190,32 @@ function shoot(e) {
     if (gameOver) return;
 
     if (e.code == "Space") {
-        let bullet = {
-            x: ship.x + shipWidth * 15 / 32,
-            y: ship.y,
-            width: tileSize / 8,
-            height: tileSize / 2,
-            used: false
-        };
-        bulletArray.push(bullet);
+        if (buffActive && buffType === "double") {
+            let bullet1 = {
+                x: ship.x + shipWidth * 10/32,
+                y: ship.y,
+                width: tileSize/8,
+                height: tileSize/2,
+                used: false
+            };
+            let bullet2 = {
+                x: ship.x + shipWidth * 20/32,
+                y: ship.y,
+                width: tileSize/8,
+                height: tileSize/2,
+                used: false
+            };
+            bulletArray.push(bullet1, bullet2);
+        } else {
+            let bullet = {
+                x: ship.x + shipWidth * 15/32,
+                y: ship.y,
+                width: tileSize/8,
+                height: tileSize/2,
+                used: false
+            };
+            bulletArray.push(bullet);
+        }
     }
 }
 
@@ -195,8 +224,14 @@ function detectCollision(a, b) {
 }
 
 function spawnBuff(x, y) {
-    buff = { x: Math.random() * (boardWidth - tileSize), y, width: tileSize, height: tileSize };
+    buff = { 
+        x: Math.random() * (boardWidth - tileSize), 
+        y, 
+        width: tileSize, 
+        height: tileSize 
+    };
     buffExists = true;
+    buffType = Math.random() < 0.5 ? "slow" : "double";
 }
 
 function activateBuff() {
@@ -204,10 +239,16 @@ function activateBuff() {
     buffExists = false;
     if (!buffActive) {
         buffActive = true;
-        alienVelocityX = Math.sign(alienVelocityX) * (Math.abs(alienVelocityX) / 2);
-        setTimeout(() => {
-            alienVelocityX = Math.sign(alienVelocityX) * (Math.abs(alienVelocityX) * 2);
-            buffActive = false;
-        }, 2000);
+        if (buffType === "slow") {
+            alienVelocityX = Math.sign(alienVelocityX) * (Math.abs(alienVelocityX) / 2);
+            setTimeout(() => {
+                alienVelocityX = Math.sign(alienVelocityX) * (Math.abs(alienVelocityX) * 2);
+                buffActive = false;
+            }, 2000);
+        } else {
+            setTimeout(() => {
+                buffActive = false;
+            }, 2000);
+        }
     }
 }
