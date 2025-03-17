@@ -82,6 +82,7 @@ let level = 1;
 let experiencePoints = 0;
 let experienceToNextLevel = 1000;
 let permanentBulletCount = 1; // Số lượng đạn cơ bản
+let gameMode = "single"; // "single" or "versus"
 
 //power ups
 let powerUpTypes = {
@@ -227,6 +228,54 @@ let powerUpTypes = {
     }
 };
 
+// AI ship
+let aiShip = {
+    x: shipX + boardWidth/3,
+    y: shipY,
+    width: shipWidth,
+    height: shipHeight,
+    active: false,
+    score: 0,
+    lives: 3,
+    shield: 100,
+    isShieldActive: false,
+    bulletCount: 1,
+    difficulty: "medium", // "easy", "medium", "hard"
+    shootCooldown: 0,
+    moveDirection: 1
+};
+
+let aiShipImg;
+let aiEnabled = false;
+let difficultySettings = {
+    easy: {
+        shootInterval: 30,
+        moveSpeed: 3,
+        reactionTime: 0.9,
+        accuracy: 0.9
+    },
+    medium: {
+        shootInterval: 30,
+        moveSpeed: 3,
+        reactionTime: 0.95,
+        accuracy: 0.95,
+        predictiveAiming: true
+    },
+    hard: {
+        shootInterval: 30,
+        moveSpeed: 4,
+        reactionTime: 1,
+        accuracy: 1,
+        predictiveAiming: true,
+        seekPowerUps: true
+    }
+};
+
+let aiBulletArray = [];
+
+// Khởi tạo highScores
+let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+
 function createStars() {
     for(let i = 0; i < 200; i++) {
         stars.push({
@@ -280,11 +329,117 @@ window.onload = function() {
         context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
     }
 
+    aiShipImg = new Image();
+    aiShipImg.src = "./ship-ai.png"; // Sử dụng hình ảnh khác cho tàu AI nếu có
+    aiShipImg.onerror = function() {
+        aiShipImg.src = "./ship.png"; // Fallback nếu không có hình ảnh riêng
+    };
+
     createStars();
     createAliens();
+    setupGameMenu();
     requestAnimationFrame(update);
     document.addEventListener("keydown", moveShip);
-    document.addEventListener("keyup", shoot);
+    document.addEventListener("keydown", shoot);
+}
+
+function setupGameMenu() {
+    // Xóa menu cũ nếu đã tồn tại
+    let existingMenu = document.getElementById("game-menu");
+    if (existingMenu) {
+        existingMenu.remove();
+    }
+    
+    // Tạo menu chọn chế độ chơi và độ khó
+    let menuDiv = document.createElement("div");
+    menuDiv.id = "game-menu";
+    menuDiv.style.position = "absolute";
+    menuDiv.style.top = "10px";
+    menuDiv.style.right = "10px";
+    menuDiv.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+    menuDiv.style.padding = "10px";
+    menuDiv.style.borderRadius = "5px";
+    menuDiv.style.color = "white";
+    menuDiv.style.fontFamily = "courier";
+    menuDiv.style.zIndex = "1000";
+    
+    // Chọn chế độ chơi
+    let modeLabel = document.createElement("div");
+    modeLabel.textContent = "Game Mode:";
+    menuDiv.appendChild(modeLabel);
+    
+    let modeSelect = document.createElement("select");
+    modeSelect.id = "game-mode";
+    modeSelect.style.margin = "5px 0";
+    modeSelect.style.padding = "3px";
+    modeSelect.style.width = "100%";
+    
+    let singleOption = document.createElement("option");
+    singleOption.value = "single";
+    singleOption.textContent = "Single Player";
+    modeSelect.appendChild(singleOption);
+    
+    let versusOption = document.createElement("option");
+    versusOption.value = "versus";
+    versusOption.textContent = "Versus AI";
+    modeSelect.appendChild(versusOption);
+    
+    menuDiv.appendChild(modeSelect);
+    
+    // Chọn độ khó
+    let diffLabel = document.createElement("div");
+    diffLabel.textContent = "AI Difficulty:";
+    menuDiv.appendChild(diffLabel);
+    
+    let diffSelect = document.createElement("select");
+    diffSelect.id = "ai-difficulty";
+    diffSelect.style.margin = "5px 0";
+    diffSelect.style.padding = "3px";
+    diffSelect.style.width = "100%";
+    
+    let easyOption = document.createElement("option");
+    easyOption.value = "easy";
+    easyOption.textContent = "Easy";
+    diffSelect.appendChild(easyOption);
+    
+    let mediumOption = document.createElement("option");
+    mediumOption.value = "medium";
+    mediumOption.textContent = "Medium";
+    diffSelect.appendChild(mediumOption);
+    
+    let hardOption = document.createElement("option");
+    hardOption.value = "hard";
+    hardOption.textContent = "Hard";
+    diffSelect.appendChild(hardOption);
+    
+    menuDiv.appendChild(diffSelect);
+    
+    // Nút áp dụng
+    let applyButton = document.createElement("button");
+    applyButton.textContent = "Apply";
+    applyButton.style.margin = "5px 0";
+    applyButton.style.padding = "5px 10px";
+    applyButton.style.width = "100%";
+    applyButton.style.cursor = "pointer";
+    applyButton.addEventListener("click", function() {
+        gameMode = modeSelect.value;
+        aiShip.difficulty = diffSelect.value;
+        aiEnabled = (gameMode === "versus");
+        
+        // Reset game khi thay đổi chế độ
+        resetGame();
+        
+        if (aiEnabled) {
+            aiShip.active = true;
+            console.log("AI enabled with difficulty: " + aiShip.difficulty);
+        } else {
+            aiShip.active = false;
+            console.log("AI disabled");
+        }
+    });
+    menuDiv.appendChild(applyButton);
+    
+    document.body.appendChild(menuDiv);
 }
 
 function update() {
@@ -307,6 +462,23 @@ function update() {
     //vẽ tàu
     context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
 
+    // Vẽ tàu AI nếu đang ở chế độ versus
+    if (aiEnabled && aiShip.active) {
+        context.drawImage(aiShipImg, aiShip.x, aiShip.y, aiShip.width, aiShip.height);
+        
+        // Vẽ shield cho AI nếu active
+        if (aiShip.isShieldActive) {
+            context.strokeStyle = "rgba(255, 0, 0, 0.5)";
+            context.lineWidth = 2;
+            context.beginPath();
+            context.arc(aiShip.x + aiShip.width/2, aiShip.y + aiShip.height/2, aiShip.width/1.5, 0, 2 * Math.PI);
+            context.stroke();
+        }
+        
+        // Cập nhật AI
+        updateAI();
+    }
+
     //vẽ shield nếu active
     if (isShieldActive) {
         context.strokeStyle = "rgba(0, 255, 255, 0.5)";
@@ -319,6 +491,11 @@ function update() {
     //hồi shield
     if (shield < 100) {
         shield = Math.min(100, shield + shieldRegenRate);
+    }
+    
+    // Hồi shield cho AI
+    if (aiEnabled && aiShip.shield < 100) {
+        aiShip.shield = Math.min(100, aiShip.shield + shieldRegenRate);
     }
 
     //vẽ aliens
@@ -371,6 +548,7 @@ function update() {
                     alien.alive = false;
                     alienCount--;
                     score += alien.type.points;
+                    gainExperience(alien.type.points / 10);
                     
                     //tạo hiệu ứng nổ
                     explosions.push({
@@ -384,6 +562,45 @@ function update() {
                 }
                 if (!bullet.piercing) bullet.used = true;
             }
+        }
+    }
+    
+    // Update và vẽ đạn của AI
+    if (aiEnabled) {
+        for (let i = 0; i < aiBulletArray.length; i++) {
+            let bullet = aiBulletArray[i];
+            bullet.x += bullet.velocityX;
+            bullet.y += bullet.velocityY;
+            context.fillStyle = "red";
+            context.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
+
+            // Kiểm tra va chạm với aliens
+            for (let j = 0; j < alienArray.length; j++) {
+                let alien = alienArray[j];
+                if (!bullet.used && alien.alive && detectCollision(bullet, alien)) {
+                    alien.health--;
+                    if (alien.health <= 0) {
+                        bullet.used = true;
+                        alien.alive = false;
+                        alienCount--;
+                        aiShip.score += alien.type.points;
+                        
+                        // Tạo hiệu ứng nổ
+                        explosions.push({
+                            x: alien.x,
+                            y: alien.y,
+                            frame: 0,
+                            duration: explosionDuration
+                        });
+                    }
+                    if (!bullet.piercing) bullet.used = true;
+                }
+            }
+        }
+        
+        // Xóa đạn AI đã sử dụng
+        while (aiBulletArray.length > 0 && (aiBulletArray[0].used || aiBulletArray[0].y < 0)) {
+            aiBulletArray.shift();
         }
     }
 
@@ -409,7 +626,23 @@ function update() {
                 }
             }
             alienBullets.splice(i, 1);
-        } else if (bullet.y > boardHeight) {
+        } 
+        // Kiểm tra va chạm với tàu AI
+        else if (aiEnabled && aiShip.active && detectCollision(bullet, aiShip)) {
+            if (aiShip.isShieldActive) {
+                aiShip.shield -= 20;
+                if (aiShip.shield <= 0) {
+                    aiShip.isShieldActive = false;
+                }
+            } else {
+                aiShip.lives--;
+                if (aiShip.lives <= 0) {
+                    aiShip.active = false;
+                }
+            }
+            alienBullets.splice(i, 1);
+        }
+        else if (bullet.y > boardHeight) {
             alienBullets.splice(i, 1);
         }
     }
@@ -448,8 +681,13 @@ function update() {
         buff.y += buffVelocityY;
         powerUpTypes[buff.type].draw(context, buff.x, buff.y, buff.width, buff.height);
 
+        // Kiểm tra va chạm với tàu người chơi
         if (detectCollision(ship, buff)) {
-            activateBuff();
+            activateBuff(ship);
+        }
+        // Kiểm tra va chạm với tàu AI
+        else if (aiEnabled && aiShip.active && detectCollision(aiShip, buff)) {
+            activateBuff(aiShip);
         }
 
         if (buff.y > boardHeight) {
@@ -461,11 +699,16 @@ function update() {
     //tạo wave mới khi hết alien
     if (alienCount == 0) {
         score += alienColumns * alienRows * 100;
+        if (aiEnabled && aiShip.active) {
+            aiShip.score += alienColumns * alienRows * 50; // AI được ít điểm hơn khi clear wave
+        }
+        
         alienColumns = Math.min(alienColumns + 1, columns/2 - 2);
         alienRows = Math.min(alienRows + 1, rows - 4);
         alienVelocityX += alienVelocityX > 0 ? 0.5 : -0.5;
         alienArray = [];
         bulletArray = [];
+        aiBulletArray = [];
         createAliens();
     }
 
@@ -484,10 +727,34 @@ function update() {
     context.fillStyle = "yellow";
     context.fillRect(5, 130, (experiencePoints/experienceToNextLevel) * 150, 10);
 
-    //vẽ high scores
-    context.fillText("High Scores:", boardWidth - 150, 20);
-    for (let i = 0; i < Math.min(5, highScores.length); i++) {
-        context.fillText(highScores[i], boardWidth - 150, 40 + i * 20);
+    // Vẽ thông tin AI nếu đang ở chế độ versus
+    if (aiEnabled) {
+        context.fillStyle = "white";
+        context.fillText("AI Score: " + aiShip.score, boardWidth - 150, 20);
+        context.fillText("AI Lives: " + aiShip.lives, boardWidth - 150, 40);
+        context.fillText("AI Shield: " + Math.floor(aiShip.shield) + "%", boardWidth - 150, 60);
+        context.fillText("AI Difficulty: " + aiShip.difficulty, boardWidth - 150, 80);
+        
+        // Hiển thị người dẫn trước
+        let leadingText = "";
+        if (score > aiShip.score) {
+            leadingText = "Player leading: +" + (score - aiShip.score);
+            context.fillStyle = "lightgreen";
+        } else if (aiShip.score > score) {
+            leadingText = "AI leading: +" + (aiShip.score - score);
+            context.fillStyle = "pink";
+        } else {
+            leadingText = "Scores tied!";
+            context.fillStyle = "yellow";
+        }
+        context.fillText(leadingText, boardWidth/2 - 80, 20);
+    } else {
+        //vẽ high scores
+        context.fillStyle = "white";
+        context.fillText("High Scores:", boardWidth - 150, 20);
+        for (let i = 0; i < Math.min(5, highScores.length); i++) {
+            context.fillText(highScores[i], boardWidth - 150, 40 + i * 20);
+        }
     }
 }
 
@@ -547,6 +814,7 @@ function shoot(e) {
                         width: tileSize/8,
                         height: tileSize/2,
                         used: false,
+                        piercing: false,
                         velocityX: Math.sin(spreadAngle) * 10,
                         velocityY: bulletVelocityY * Math.cos(spreadAngle)
                     };
@@ -563,6 +831,7 @@ function shoot(e) {
                     width: tileSize/8,
                     height: tileSize/2,
                     used: false,
+                    piercing: false,
                     velocityX: Math.sin(spreadAngle) * 10,
                     velocityY: bulletVelocityY * Math.cos(spreadAngle)
                 };
@@ -599,22 +868,34 @@ function spawnBuff(x, y) {
     buffExists = true;
 }
 
-function activateBuff() {
+function activateBuff(targetShip) {
     buffExists = false;
     buffActive = true;
     buffType = buff.type;
+    
+    // Xác định xem đây là tàu người chơi hay AI
+    const isPlayerShip = (targetShip === ship);
+    
     buff = null;
 
     let originalAlienVelocity = alienVelocityX; // Lưu tốc độ gốc của alien
 
     switch(buffType) {
         case "shield":
-            isShieldActive = true;
-            shield = 100;
-            setTimeout(() => {
-                isShieldActive = false;
-                buffActive = false;
-            }, powerUpTypes.shield.duration);
+            if (isPlayerShip) {
+                isShieldActive = true;
+                shield = 100;
+                setTimeout(() => {
+                    isShieldActive = false;
+                    if (isPlayerShip) buffActive = false;
+                }, powerUpTypes.shield.duration);
+            } else {
+                targetShip.isShieldActive = true;
+                targetShip.shield = 100;
+                setTimeout(() => {
+                    targetShip.isShieldActive = false;
+                }, powerUpTypes.shield.duration);
+            }
             break;
         
         case "rapidFire":
@@ -622,22 +903,31 @@ function activateBuff() {
             bulletVelocityY *= 2;
             setTimeout(() => {
                 bulletVelocityY = originalVelocity;
-                buffActive = false;
+                if (isPlayerShip) buffActive = false;
             }, powerUpTypes.rapidFire.duration);
             break;
         
         case "piercingShot":
-            bulletArray.forEach(bullet => bullet.piercing = true);
-            setTimeout(() => {
-                bulletArray.forEach(bullet => bullet.piercing = false);
-                buffActive = false;
-            }, powerUpTypes.piercingShot.duration);
+            if (isPlayerShip) {
+                bulletArray.forEach(bullet => bullet.piercing = true);
+                setTimeout(() => {
+                    bulletArray.forEach(bullet => bullet.piercing = false);
+                    buffActive = false;
+                }, powerUpTypes.piercingShot.duration);
+            } else {
+                aiBulletArray.forEach(bullet => bullet.piercing = true);
+                setTimeout(() => {
+                    aiBulletArray.forEach(bullet => bullet.piercing = false);
+                }, powerUpTypes.piercingShot.duration);
+            }
             break;
         
         case "multiShot":
-            setTimeout(() => {
-                buffActive = false;
-            }, powerUpTypes.multiShot.duration);
+            if (isPlayerShip) {
+                setTimeout(() => {
+                    buffActive = false;
+                }, powerUpTypes.multiShot.duration);
+            }
             break;
         
         case "bomb":
@@ -645,8 +935,12 @@ function activateBuff() {
                 if (alien.alive) {
                     alien.alive = false;
                     alienCount--;
-                    score += alien.type.points;
-                    gainExperience(50);
+                    if (isPlayerShip) {
+                        score += alien.type.points;
+                        gainExperience(50);
+                    } else {
+                        targetShip.score += alien.type.points;
+                    }
                     explosions.push({
                         x: alien.x,
                         y: alien.y,
@@ -655,22 +949,184 @@ function activateBuff() {
                     });
                 }
             });
-            buffActive = false;
+            if (isPlayerShip) buffActive = false;
             break;
         
         case "permanentBulletUp":
-            permanentBulletCount++;
-            buffActive = false;
+            if (isPlayerShip) {
+                permanentBulletCount++;
+                buffActive = false;
+            } else {
+                targetShip.bulletCount++;
+            }
             break;
         
         case "slowAliens":
             alienVelocityX *= 0.5; // Giảm một nửa tốc độ
             setTimeout(() => {
                 alienVelocityX = originalAlienVelocity;
-                buffActive = false;
+                if (isPlayerShip) buffActive = false;
             }, powerUpTypes.slowAliens.duration);
             break;
     }
+}
+
+function updateAI() {
+    const settings = difficultySettings[aiShip.difficulty];
+    
+    // Di chuyển AI
+    aiShip.shootCooldown--;
+    
+    // Kiểm tra xem có buff để nhặt không (chỉ ở mức độ khó)
+    if (settings.seekPowerUps && buff && !buffExists) {
+        const shouldSeekBuff = Math.random() < 0.8; // 80% cơ hội đi lấy buff
+        if (shouldSeekBuff) {
+            const targetX = buff.x;
+            // Di chuyển đến vị trí của buff
+        }
+    }
+    
+    // Tìm alien gần nhất để nhắm bắn
+    let targetAlien = findBestTarget(settings);
+    
+    if (targetAlien) {
+        let targetX = targetAlien.x + targetAlien.width/2 - aiShip.width/2;
+        
+        // Dự đoán vị trí cho mức độ trung bình và khó
+        if (settings.predictiveAiming) {
+            const bulletTravelTime = Math.abs(targetAlien.y - aiShip.y) / Math.abs(bulletVelocityY);
+            const predictedX = targetAlien.x + (alienVelocityX * bulletTravelTime);
+            targetX = predictedX + targetAlien.width/2 - aiShip.width/2;
+            
+            // Kiểm tra xem alien có đổi hướng không
+            if (predictedX + targetAlien.width >= boardWidth || predictedX <= 0) {
+                targetX = targetAlien.x + targetAlien.width/2 - aiShip.width/2;
+            }
+        }
+        
+        // Thêm độ chính xác dựa trên độ khó
+        const accuracy = settings.accuracy;
+        const targetWithError = targetX + (Math.random() * 2 - 1) * (1 - accuracy) * 100;
+        
+        // Di chuyển tàu AI
+        if (Math.abs(aiShip.x - targetWithError) > settings.moveSpeed) {
+            if (aiShip.x < targetWithError) {
+                aiShip.x += settings.moveSpeed;
+            } else {
+                aiShip.x -= settings.moveSpeed;
+            }
+        }
+        
+        // Giới hạn không cho tàu đi ra ngoài màn hình
+        aiShip.x = Math.max(0, Math.min(boardWidth - aiShip.width, aiShip.x));
+        
+        // Bắn đạn nếu hết thời gian cooldown và có xác suất bắn dựa trên độ khó
+        if (aiShip.shootCooldown <= 0 && Math.random() < settings.reactionTime) {
+            aiShoot();
+            aiShip.shootCooldown = settings.shootInterval;
+        }
+    } else {
+        // Nếu không có alien, di chuyển qua lại
+        aiShip.x += settings.moveSpeed * aiShip.moveDirection;
+        
+        // Đổi hướng nếu chạm biên
+        if (aiShip.x <= 0 || aiShip.x + aiShip.width >= boardWidth) {
+            aiShip.moveDirection *= -1;
+        }
+    }
+    
+    // Né tránh đạn của alien
+    if (aiShip.difficulty !== "easy") {
+        for (let i = 0; i < alienBullets.length; i++) {
+            let bullet = alienBullets[i];
+            // Nếu đạn đang đi xuống và gần tàu AI
+            if (Math.abs(bullet.x - (aiShip.x + aiShip.width/2)) < aiShip.width && 
+                bullet.y < aiShip.y && bullet.y > aiShip.y - 100) {
+                // Né sang trái hoặc phải tùy thuộc vào vị trí hiện tại
+                const dodgeDirection = (aiShip.x > boardWidth/2) ? -1 : 1;
+                aiShip.x += settings.moveSpeed * 2 * dodgeDirection;
+                break;
+            }
+        }
+    }
+}
+
+function findBestTarget(settings) {
+    let bestTarget = null;
+    let bestScore = -Infinity;
+    
+    for (let i = 0; i < alienArray.length; i++) {
+        if (alienArray[i].alive) {
+            const alien = alienArray[i];
+            let score = 0;
+            
+            // Tính điểm dựa trên khoảng cách
+            const dx = alien.x + alien.width/2 - (aiShip.x + aiShip.width/2);
+            const dy = alien.y - aiShip.y;
+            const distance = Math.sqrt(dx*dx + dy*dy);
+            score -= distance * 0.5; // Ưu tiên alien gần hơn
+            
+            // Ưu tiên alien nguy hiểm (shooter) ở mức độ trung bình và khó
+            if (settings.predictiveAiming && alien.type === alienTypes.shooter) {
+                score += 300;
+            }
+            
+            // Ưu tiên alien có nhiều máu ở mức độ khó
+            if (settings.seekPowerUps && alien.health > 1) {
+                score += alien.health * 100;
+            }
+            
+            // Ưu tiên alien gần với buff (nếu có) ở mức độ khó
+            if (settings.seekPowerUps && buff) {
+                const distanceToBuff = Math.sqrt(
+                    Math.pow(alien.x - buff.x, 2) + 
+                    Math.pow(alien.y - buff.y, 2)
+                );
+                if (distanceToBuff < 200) {
+                    score += (200 - distanceToBuff);
+                }
+            }
+            
+            if (score > bestScore) {
+                bestScore = score;
+                bestTarget = alien;
+            }
+        }
+    }
+    
+    return bestTarget;
+}
+
+function aiShoot() {
+    if (!aiShip.active) return;
+    
+    // Bắn đạn dựa trên số lượng đạn của AI
+    for(let i = 0; i < aiShip.bulletCount; i++) {
+        let spreadAngle = (i - (aiShip.bulletCount-1)/2) * 0.15;
+        let bullet = {
+            x: aiShip.x + aiShip.width/2,
+            y: aiShip.y,
+            width: tileSize/8,
+            height: tileSize/2,
+            used: false,
+            piercing: false,
+            velocityX: Math.sin(spreadAngle) * 10,
+            velocityY: bulletVelocityY * Math.cos(spreadAngle)
+        };
+        aiBulletArray.push(bullet);
+    }
+}
+
+function resetAiShip() {
+    aiShip.x = shipX + boardWidth/3;
+    aiShip.y = shipY;
+    aiShip.lives = 3;
+    aiShip.shield = 100;
+    aiShip.isShieldActive = false;
+    aiShip.score = 0;
+    aiShip.bulletCount = 1;
+    aiShip.shootCooldown = 0;
+    aiShip.moveDirection = 1;
 }
 
 function updateHighScores() {
@@ -692,6 +1148,7 @@ function resetGame() {
     gameOver = false;
     alienArray = [];
     bulletArray = [];
+    aiBulletArray = [];
     alienBullets = [];
     explosions = [];
     buff = null;
@@ -701,6 +1158,14 @@ function resetGame() {
     alienVelocityX = 0.5;
     ship.x = shipX;
     ship.y = shipY;
+    
+    if (aiEnabled) {
+        resetAiShip();
+        aiShip.active = true;
+    } else {
+        aiShip.active = false;
+    }
+    
     createAliens();
     level = 1;
     experiencePoints = 0;
@@ -732,9 +1197,16 @@ function levelUp() {
     // Tăng sức mạnh theo level
     bulletVelocityY -= 0.5;
     shieldRegenRate += 0.05;
-    
+     
     // Hiệu ứng level up
     context.fillStyle = "yellow";
     context.font = "32px courier";
     context.fillText("LEVEL UP!", boardWidth/2 - 80, boardHeight/2);
 }
+
+// Ngăn chặn hành vi mặc định của phím Space
+window.addEventListener("keydown", function(e) {
+    if(e.code === "Space") {
+        e.preventDefault();
+    }
+});
