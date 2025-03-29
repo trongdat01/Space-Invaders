@@ -522,7 +522,7 @@ function showPlayerNameDialog() {
 
     // Tiêu đề
     let title = document.createElement("h2");
-    title.textContent = "SPACE INVADERS";
+    title.textContent = "SPACE SHOOTER";
     title.style.color = "#00ff00";
     title.style.marginBottom = "20px";
     dialog.appendChild(title);
@@ -572,6 +572,20 @@ function showPlayerNameDialog() {
     highScoresButton.style.fontFamily = "courier";
     highScoresButton.style.fontWeight = "bold";
     dialog.appendChild(highScoresButton);
+    
+    // Thêm nút hướng dẫn
+    let instructionsButton = document.createElement("button");
+    instructionsButton.textContent = "HƯỚNG DẪN";
+    instructionsButton.style.backgroundColor = "#4CAF50"; // Màu xanh lá
+    instructionsButton.style.color = "black";
+    instructionsButton.style.border = "none";
+    instructionsButton.style.padding = "10px 20px";
+    instructionsButton.style.marginTop = "10px";
+    instructionsButton.style.cursor = "pointer";
+    instructionsButton.style.width = "90%";
+    instructionsButton.style.fontFamily = "courier";
+    instructionsButton.style.fontWeight = "bold";
+    dialog.appendChild(instructionsButton);
 
     // Thêm sự kiện
     nameInput.focus();
@@ -587,6 +601,12 @@ function showPlayerNameDialog() {
         document.body.removeChild(modalBackdrop);
         showHighScoresScreen();
     };
+    
+    // Thêm sự kiện cho nút hướng dẫn
+    instructionsButton.onclick = function() {
+        document.body.removeChild(modalBackdrop);
+        showInstructionsScreen();
+    };
 
     nameInput.addEventListener("keydown", function(e) {
         if (e.key === "Enter") {
@@ -599,11 +619,11 @@ function showPlayerNameDialog() {
     document.body.appendChild(modalBackdrop);
 }
 
-// Thêm hàm mới hiển thị màn hình điểm cao
-function showHighScoresScreen() {
+// Thêm hàm hiển thị màn hình hướng dẫn
+function showInstructionsScreen() {
     // Tạo lớp phủ nền
     let modalBackdrop = document.createElement("div");
-    modalBackdrop.id = "highscores-modal-backdrop";
+    modalBackdrop.id = "instructions-modal-backdrop";
     modalBackdrop.style.position = "fixed";
     modalBackdrop.style.top = "0";
     modalBackdrop.style.left = "0";
@@ -618,103 +638,277 @@ function showHighScoresScreen() {
     // Tạo hộp thoại
     let dialog = document.createElement("div");
     dialog.style.backgroundColor = "black";
-    dialog.style.border = "2px solid #00ff00";
+    dialog.style.border = "2px solid #4CAF50"; // Khung màu xanh lá
     dialog.style.padding = "20px";
     dialog.style.borderRadius = "10px";
-    dialog.style.width = "400px";
+    dialog.style.width = "600px";
+    dialog.style.maxHeight = "80vh";
+    dialog.style.overflowY = "auto";
     dialog.style.fontFamily = "courier";
     dialog.style.color = "white";
     dialog.style.textAlign = "center";
 
     // Tiêu đề
     let title = document.createElement("h2");
-    title.textContent = "ĐIỂM CAO NHẤT";
-    title.style.color = "#00ff00";
+    title.textContent = "HƯỚNG DẪN SPACE SHOOTER";
+    title.style.color = "#4CAF50"; // Màu xanh lá
     title.style.marginBottom = "20px";
     dialog.appendChild(title);
 
-    // Hiển thị danh sách điểm cao
-    if (highScores && highScores.length > 0) {
-        let tableContainer = document.createElement("div");
-        tableContainer.style.marginBottom = "20px";
-        tableContainer.style.maxHeight = "300px";
-        tableContainer.style.overflowY = "auto";
+    // Nội dung hướng dẫn
+    let content = document.createElement("div");
+    content.style.textAlign = "left";
+    content.style.marginBottom = "20px";
+    
+    // Phần điều khiển
+    let controlsTitle = document.createElement("h3");
+    controlsTitle.textContent = "ĐIỀU KHIỂN";
+    controlsTitle.style.color = "#f0c808"; // Màu vàng
+    controlsTitle.style.borderBottom = "1px solid #f0c808";
+    controlsTitle.style.paddingBottom = "5px";
+    content.appendChild(controlsTitle);
+    
+    let controlsList = document.createElement("ul");
+    controlsList.style.listStyleType = "none";
+    controlsList.style.padding = "0 10px";
+    
+    let controls = [
+        "Mũi tên TRÁI: Di chuyển tàu sang trái",
+        "Mũi tên PHẢI: Di chuyển tàu sang phải",
+        "SPACE: Bắn đạn",
+        "R: Khởi động lại khi game over",
+        "ENTER: Khởi động lại khi game over hoặc thắng"
+    ];
+    
+    controls.forEach(control => {
+        let item = document.createElement("li");
+        item.textContent = control;
+        item.style.margin = "10px 0";
+        controlsList.appendChild(item);
+    });
+    
+    content.appendChild(controlsList);
+    
+    // Phần chế độ chơi
+    let modesTitle = document.createElement("h3");
+    modesTitle.textContent = "CHẾ ĐỘ CHƠI";
+    modesTitle.style.color = "#f0c808";
+    modesTitle.style.borderBottom = "1px solid #f0c808";
+    modesTitle.style.paddingBottom = "5px";
+    modesTitle.style.marginTop = "20px";
+    content.appendChild(modesTitle);
+    
+    let modesList = document.createElement("ul");
+    modesList.style.listStyleType = "none";
+    modesList.style.padding = "0 10px";
+    
+    let modes = [
+        "Single Player: Chơi đơn, tiêu diệt alien và boss",
+        "Versus AI: Chơi cùng AI, cạnh tranh điểm số"
+    ];
+    
+    modes.forEach(mode => {
+        let item = document.createElement("li");
+        item.textContent = mode;
+        item.style.margin = "10px 0";
+        modesList.appendChild(item);
+    });
+    
+    content.appendChild(modesList);
+    
+    // Phần power-ups
+    let powerUpsTitle = document.createElement("h3");
+    powerUpsTitle.textContent = "POWER-UPS";
+    powerUpsTitle.style.color = "#f0c808";
+    powerUpsTitle.style.borderBottom = "1px solid #f0c808";
+    powerUpsTitle.style.paddingBottom = "5px";
+    powerUpsTitle.style.marginTop = "20px";
+    content.appendChild(powerUpsTitle);
+    
+    // Tạo bảng power-ups với hình ảnh
+    let powerUpsTable = document.createElement("table");
+    powerUpsTable.style.width = "100%";
+    powerUpsTable.style.borderCollapse = "collapse";
+    powerUpsTable.style.marginTop = "10px";
+    
+    // Tạo header cho bảng - bỏ cột màu sắc
+    let tableHeader = document.createElement("tr");
+    ["HÌNH ẢNH", "TÊN", "HIỆU ỨNG"].forEach(headerText => {
+        let header = document.createElement("th");
+        header.textContent = headerText;
+        header.style.padding = "8px";
+        header.style.borderBottom = "1px solid #555";
+        header.style.textAlign = "left";
+        tableHeader.appendChild(header);
+    });
+    powerUpsTable.appendChild(tableHeader);
+    
+    // Danh sách power-ups với hình ảnh và hiệu ứng chi tiết
+    let powerUpsList = [
+        { 
+            name: "Shield", 
+            effect: "Tạo lá chắn bảo vệ tàu khỏi đạn trong 8 giây",
+            imgSrc: "./buffship/shield.png"
+        },
+        { 
+            name: "Rapid Fire", 
+            effect: "Tăng gấp đôi tốc độ đạn trong 10 giây",
+            imgSrc: "./buffship/rapidFire.png"
+        },
+        { 
+            name: "Piercing Shot", 
+            effect: "Đạn xuyên qua nhiều alien trong 12 giây",
+            imgSrc: "./buffship/piercingShot.png"
+        },
+        { 
+            name: "Multi Shot", 
+            effect: "Bắn cùng lúc 3 hướng khác nhau trong 8 giây",
+            imgSrc: "./buffship/multiShot.png"
+        },
+        { 
+            name: "Bomb", 
+            effect: "Phá hủy tất cả alien có trên màn hình ngay lập tức",
+            imgSrc: "./buffship/bomb.png"
+        },
+        { 
+            name: "Bullet Up", 
+            effect: "Tăng vĩnh viễn số lượng đạn bắn ra mỗi lần",
+            imgSrc: "./buffship/permanentBulletUp.png"
+        },
+        { 
+            name: "Slow Aliens", 
+            effect: "Làm chậm di chuyển của alien trong 15 giây",
+            imgSrc: "./buffship/slowAliens.png"
+        }
+    ];
+    
+    powerUpsList.forEach((powerUp, index) => {
+        let row = document.createElement("tr");
+        row.style.backgroundColor = index % 2 === 0 ? "rgba(50, 50, 50, 0.5)" : "rgba(30, 30, 30, 0.5)";
+        // Cell cho hình ảnh
+        let imgCell = document.createElement("td");
+        imgCell.style.padding = "8px";
+        imgCell.style.borderBottom = "1px solid #333";
+        imgCell.style.width = "64px";
         
-        let table = document.createElement("table");
-        table.style.width = "100%";
-        table.style.borderCollapse = "collapse";
+        // Tạo hình ảnh
+        let img = document.createElement("img");
+        img.src = powerUp.imgSrc;
+        img.alt = powerUp.name;
+        img.style.width = "32px";
+        img.style.height = "32px";
+        img.style.display = "block";
+        img.style.margin = "0 auto";
         
-        // Tạo header cho bảng
-        let thead = document.createElement("thead");
-        let headerRow = document.createElement("tr");
-        
-        let rankHeader = document.createElement("th");
-        rankHeader.textContent = "Xếp hạng";
-        rankHeader.style.padding = "8px";
-        rankHeader.style.textAlign = "center";
-        rankHeader.style.borderBottom = "1px solid #00ff00";
-        
-        let nameHeader = document.createElement("th");
-        nameHeader.textContent = "Tên";
-        nameHeader.style.padding = "8px";
-        nameHeader.style.textAlign = "left";
-        nameHeader.style.borderBottom = "1px solid #00ff00";
-        
-        let scoreHeader = document.createElement("th");
-        scoreHeader.textContent = "Điểm";
-        scoreHeader.style.padding = "8px";
-        scoreHeader.style.textAlign = "right";
-        scoreHeader.style.borderBottom = "1px solid #00ff00";
-        
-        headerRow.appendChild(rankHeader);
-        headerRow.appendChild(nameHeader);
-        headerRow.appendChild(scoreHeader);
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
-        
-        // Tạo body cho bảng
-        let tbody = document.createElement("tbody");
-        
-        for (let i = 0; i < highScores.length; i++) {
-            let row = document.createElement("tr");
+        // Xử lý lỗi khi tải hình ảnh
+        img.onerror = function() {
+            this.onerror = null;
+            this.src = powerUp.imgSrc.toLowerCase(); // Thử lại với tên file viết thường
             
-            let rankCell = document.createElement("td");
-            rankCell.textContent = (i + 1);
-            rankCell.style.padding = "8px";
-            rankCell.style.textAlign = "center";
-            rankCell.style.color = i < 3 ? "#ffd700" : "white"; // Màu gold cho top 3
+            // Nếu vẫn lỗi, hiển thị placeholder
+            this.onerror = function() {
+                let placeholder = document.createElement("div");
+                placeholder.style.width = "32px";
+                placeholder.style.height = "32px";
+                
+                // Sử dụng các màu tương ứng với từng loại buff cho placeholder
+                switch(powerUp.name) {
+                    case "Shield": placeholder.style.backgroundColor = "blue"; break;
+                    case "Rapid Fire": placeholder.style.backgroundColor = "red"; break;
+                    case "Piercing Shot": placeholder.style.backgroundColor = "purple"; break;
+                    case "Multi Shot": placeholder.style.backgroundColor = "green"; break;
+                    case "Bomb": placeholder.style.backgroundColor = "orange"; break;
+                    case "Bullet Up": placeholder.style.backgroundColor = "cyan"; break;
+                    case "Slow Aliens": placeholder.style.backgroundColor = "lightblue"; break;
+                    default: placeholder.style.backgroundColor = "gray";
+                }
+                
+                placeholder.style.margin = "0 auto";
+                placeholder.style.borderRadius = "4px";
+                placeholder.style.border = "1px solid white";
+                
+                imgCell.innerHTML = "";
+                imgCell.appendChild(placeholder);
+            };
+        };
+        
+        imgCell.appendChild(img);
+        row.appendChild(imgCell);
+        
+        // Cells cho tên và hiệu ứng (bỏ cột màu sắc)
+        ["name", "effect"].forEach(prop => {
+            let cell = document.createElement("td");
+            cell.textContent = powerUp[prop];
+            cell.style.padding = "8px";
+            cell.style.borderBottom = "1px solid #333";
             
-            let nameCell = document.createElement("td");
-            nameCell.style.padding = "8px";
-            nameCell.style.textAlign = "left";
-            
-            let scoreCell = document.createElement("td");
-            scoreCell.style.padding = "8px";
-            scoreCell.style.textAlign = "right";
-            
-            if (typeof highScores[i] === "number") {
-                nameCell.textContent = "Không tên";
-                scoreCell.textContent = highScores[i];
-            } else {
-                nameCell.textContent = highScores[i].name || "Không tên";
-                scoreCell.textContent = highScores[i].score;
+            // Điều chỉnh style cho cột hiệu ứng
+            if (prop === "effect") {
+                cell.style.width = "70%"; // Tăng độ rộng cho cột hiệu ứng
             }
             
-            row.appendChild(rankCell);
-            row.appendChild(nameCell);
-            row.appendChild(scoreCell);
-            tbody.appendChild(row);
-        }
+            row.appendChild(cell);
+        });
         
-        table.appendChild(tbody);
-        tableContainer.appendChild(table);
-        dialog.appendChild(tableContainer);
-    } else {
-        let noScoresMsg = document.createElement("p");
-        noScoresMsg.textContent = "Chưa có điểm cao nào được ghi nhận.";
-        noScoresMsg.style.marginBottom = "20px";
-        dialog.appendChild(noScoresMsg);
-    }
+        powerUpsTable.appendChild(row);
+    });
+    
+    content.appendChild(powerUpsTable);
+    
+    // Thêm lưu ý về power-up
+    let powerUpNote = document.createElement("p");
+    powerUpNote.innerHTML = "<strong>Lưu ý:</strong> Các power-up sẽ rơi xuống khi bạn tiêu diệt alien. Hãy di chuyển tàu để bắt chúng!";
+    powerUpNote.style.marginTop = "10px";
+    powerUpNote.style.padding = "0 10px";
+    powerUpNote.style.fontStyle = "italic";
+    powerUpNote.style.color = "#f0c808";
+    content.appendChild(powerUpNote);
+    
+    // Phần boss fight
+    let bossTitle = document.createElement("h3");
+    bossTitle.textContent = "BOSS FIGHT";
+    bossTitle.style.color = "#f0c808";
+    bossTitle.style.borderBottom = "1px solid #f0c808";
+    bossTitle.style.paddingBottom = "5px";
+    bossTitle.style.marginTop = "20px";
+    content.appendChild(bossTitle);
+    
+    let bossInfo = document.createElement("p");
+    bossInfo.innerHTML = "Khi tiêu diệt đủ số lượng alien, bạn sẽ phải đối mặt với BOSS.<br>BOSS sẽ bắn các tia laser rất mạnh. Hãy né tránh chúng và bắn vào BOSS để giành chiến thắng!";
+    bossInfo.style.lineHeight = "1.5";
+    bossInfo.style.padding = "0 10px";
+    content.appendChild(bossInfo);
+    
+    // Phần mẹo
+    let tipsTitle = document.createElement("h3");
+    tipsTitle.textContent = "MẸO CHƠI";
+    tipsTitle.style.color = "#f0c808";
+    tipsTitle.style.borderBottom = "1px solid #f0c808";
+    tipsTitle.style.paddingBottom = "5px";
+    tipsTitle.style.marginTop = "20px";
+    content.appendChild(tipsTitle);
+    
+    let tipsList = document.createElement("ul");
+    tipsList.style.listStyleType = "none";
+    tipsList.style.padding = "0 10px";
+    
+    let tips = [
+        "Ưu tiên tiêu diệt alien loại bắn đạn (màu hồng) trước",
+        "Thu thập power-up Bullet Up để tăng sức mạnh vĩnh viễn",
+        "Shield rất có giá trị khi đối đầu với boss",
+        "Trong chế độ versus, hãy cạnh tranh điểm số với AI"
+    ];
+    
+    tips.forEach(tip => {
+        let item = document.createElement("li");
+        item.textContent = "👉 " + tip;
+        item.style.margin = "10px 0";
+        tipsList.appendChild(item);
+    });
+    
+    content.appendChild(tipsList);
+    
+    dialog.appendChild(content);
 
     // Nút Quay Lại
     let backButton = document.createElement("button");
@@ -723,7 +917,7 @@ function showHighScoresScreen() {
     backButton.style.color = "black";
     backButton.style.border = "none";
     backButton.style.padding = "10px 20px";
-    backButton.style.marginTop = "10px";
+    backButton.style.marginTop = "20px";
     backButton.style.cursor = "pointer";
     backButton.style.width = "90%";
     backButton.style.fontFamily = "courier";
@@ -739,6 +933,70 @@ function showHighScoresScreen() {
     // Thêm vào DOM
     modalBackdrop.appendChild(dialog);
     document.body.appendChild(modalBackdrop);
+}
+
+// Thêm hình ảnh cho phần hướng dẫn
+function loadInstructionImages() {
+    try {
+        // Tải hình ảnh cho tàu
+        const shipInstrImg = new Image();
+        shipInstrImg.src = "./ship.png";
+        window.shipInstructionImg = shipInstrImg;
+        
+        // Tải hình ảnh cho alien
+        const alienInstrImg = new Image();
+        alienInstrImg.src = "./alien.png";
+        window.alienInstructionImg = alienInstrImg;
+        
+        // Tải hình ảnh cho boss
+        const bossInstrImg = new Image();
+        bossInstrImg.src = "./boss.png";
+        window.bossInstructionImg = bossInstrImg;
+        
+        // Tải hình ảnh buff cho phần hướng dẫn
+        const buffTypes = [
+            'shield',
+            'rapidFire',
+            'piercingShot',
+            'multiShot',
+            'bomb',
+            'permanentBulletUp',
+            'slowAliens'
+        ];
+        
+        window.instructionBuffImages = {};
+        
+        buffTypes.forEach(type => {
+            const img = new Image();
+            img.src = `./buffship/${type}.png`;
+            
+            img.onload = function() {
+                console.log(`Loaded instruction buff image: ${type}`);
+                window.instructionBuffImages[type] = img;
+            };
+            
+            img.onerror = function() {
+                console.error(`Failed to load instruction buff image: ${type}`);
+                
+                // Thử lại với tên file viết thường
+                const retryImg = new Image();
+                retryImg.src = `./buffship/${type.toLowerCase()}.png`;
+                
+                retryImg.onload = function() {
+                    console.log(`Loaded instruction buff image (lowercase): ${type}`);
+                    window.instructionBuffImages[type] = retryImg;
+                };
+                
+                retryImg.onerror = function() {
+                    console.error(`Failed to load instruction buff image with all attempts: ${type}`);
+                };
+            };
+        });
+        
+        console.log("Loaded instruction images");
+    } catch (error) {
+        console.error("Error loading instruction images:", error);
+    }
 }
 
 // Khởi tạo highScores
@@ -782,8 +1040,8 @@ function drawBackground() {
 let boss = null;
 let bossWidth = tileSize * 4;
 let bossHeight = tileSize * 4;
-let bossHealth = 100;
-let bossMaxHealth = 100;
+let bossHealth = 50;
+let bossMaxHealth = 50;
 let bossVelocityX = 2;
 let bossLasers = [];
 let bossLaserWidth = tileSize * 2;
@@ -855,6 +1113,9 @@ window.onload = function() {
         
         // Tải tất cả hình ảnh cho buff
         loadAllBuffImages();
+        
+        // Tải hình ảnh cho hướng dẫn
+        loadInstructionImages();
         
         // Hiển thị hộp thoại nhập tên
         showPlayerNameDialog();
