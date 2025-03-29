@@ -2,17 +2,32 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport", content="width=device-width, initial-scale=1.0">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Space Invaders</title>
-        <link rel="stylesheet" href="space.css">
+        <style>
+            body {
+                background-color: black;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                overflow: hidden;
+            }
+            canvas {
+                border: 3px solid white;
+                z-index: 10; /* Đảm bảo canvas hiển thị trên cùng */
+            }
+            #board {
+                position: absolute;
+                z-index: 20; /* Đảm bảo board có z-index cao nhất */
+            }
+        </style>
     </head>
 
     <body>
-        <div id="container">
-            <canvas id="board"></canvas>
-            <canvas id="background"></canvas>
-        </div>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+        <canvas id="board"></canvas>
         <script src="space.js"></script>
     </body>
 </html>

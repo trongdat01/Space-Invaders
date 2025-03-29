@@ -48,6 +48,13 @@ let buffActive = false;
 let buffExists = false;
 let buffType = null;
 
+// Thêm biến buff riêng cho shipAI
+let buffAI = null;
+let buffAIVelocityY = 2;
+let buffAIActive = false;
+let buffAIExists = false;
+let buffAIType = null;
+
 let score = 0;
 let gameOver = false;
 
@@ -255,6 +262,183 @@ let powerUpTypes = {
                 context.moveTo(x + width/2, y + height/2);
                 context.lineTo(x + width/2, y + height/3);
                 context.strokeStyle = "white";
+                context.stroke();
+            }
+        }
+    }
+};
+
+// Power-up riêng cho AI
+let powerUpAITypes = {
+    shield: { 
+        color: "blue", 
+        duration: 8000,
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback vẽ shield nếu không tải được hình ảnh
+                context.fillStyle = this.color;
+                context.beginPath();
+                context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
+                context.fill();
+                context.strokeStyle = "red"; // Màu đỏ để phân biệt với buff người chơi
+                context.lineWidth = 2;
+                context.stroke();
+                
+                // Vẽ biểu tượng shield
+                context.beginPath();
+                context.moveTo(x + width/2, y + height/4);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.lineTo(x + width/2, y + height*3/4);
+                context.lineTo(x + width/4, y + height/2);
+                context.closePath();
+                context.strokeStyle = "red";
+                context.stroke();
+            }
+        }
+    },
+    rapidFire: { 
+        color: "red", 
+        duration: 10000,
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                context.beginPath();
+                context.moveTo(x + width/2, y + height/4);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.lineTo(x + width/2, y + height/2);
+                context.lineTo(x + width*3/4, y + height*3/4);
+                context.strokeStyle = "red";
+                context.lineWidth = 2;
+                context.stroke();
+            }
+        }
+    },
+    piercingShot: { 
+        color: "purple", 
+        duration: 12000,
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                context.beginPath();
+                context.moveTo(x + width/4, y + height/2);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.moveTo(x + width*2/3, y + height/3);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.lineTo(x + width*2/3, y + height*2/3);
+                context.strokeStyle = "red";
+                context.lineWidth = 2;
+                context.stroke();
+            }
+        }
+    },
+    bomb: { 
+        color: "orange", 
+        duration: 0,
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.beginPath();
+                context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
+                context.fill();
+                context.beginPath();
+                context.moveTo(x + width/2, y + height/4);
+                context.lineTo(x + width/2, y + height*3/4);
+                context.moveTo(x + width/4, y + height/2);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.strokeStyle = "red";
+                context.lineWidth = 3;
+                context.stroke();
+            }
+        }
+    },
+    multiShot: {
+        color: "green",
+        duration: 8000,
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                for(let i = 0; i < 3; i++) {
+                    context.beginPath();
+                    context.moveTo(x + width*(i+1)/4, y + height*3/4);
+                    context.lineTo(x + width*(i+1)/4, y + height/4);
+                    context.lineTo(x + width*(i+0.7)/4, y + height/3);
+                    context.moveTo(x + width*(i+1)/4, y + height/4);
+                    context.lineTo(x + width*(i+1.3)/4, y + height/3);
+                    context.strokeStyle = "red";
+                    context.lineWidth = 2;
+                    context.stroke();
+                }
+            }
+        }
+    },
+    permanentBulletUp: {
+        color: "cyan",
+        duration: 0, // Vĩnh viễn
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                context.fillStyle = "red";
+                context.font = "20px courier";
+                context.fillText("+1", x + width/4, y + height*2/3);
+                context.fillStyle = "red";
+                context.fillRect(x + width/4, y + height/4, width/2, height/3);
+            }
+        }
+    },
+    slowAliens: {
+        color: "lightblue",
+        duration: 15000,
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                context.beginPath();
+                context.arc(x + width/2, y + height/2, width/3, 0, Math.PI * 2);
+                context.strokeStyle = "red";
+                context.lineWidth = 2;
+                context.stroke();
+                context.beginPath();
+                context.moveTo(x + width/2, y + height/2);
+                context.lineTo(x + width/2, y + height/3);
+                context.strokeStyle = "red";
                 context.stroke();
             }
         }
@@ -610,54 +794,90 @@ let isBossFight = false;
 let bossDefeated = false;
 
 window.onload = function() {
-    board = document.getElementById("board");
-    board.width = boardWidth;
-    board.height = boardHeight;
-    context = board.getContext("2d");
-
-    //load tất cả hình ảnh alien
-    for (let type in alienTypes) {
-        let img = new Image();
-        img.src = alienTypes[type].img;
-        alienTypes[type].imgObject = img;
-    }
-
-    shipImg = new Image();
-    shipImg.src = "./ship.png";
-    shipImg.onload = function() {
-        context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
-    }
-
-    aiShipImg = new Image();
-    aiShipImg.src = "./shipAI.png"; // Cập nhật đường dẫn ảnh cho tàu AI
-    aiShipImg.onerror = function() {
-        aiShipImg.src = "./ship.png"; // Fallback nếu không có hình ảnh riêng
-    };
-
-    createStars();
-    createAliens();
-    setupGameMenu();
-    
-    // Tải điểm cao từ localStorage và chuyển đổi định dạng cũ nếu cần
-    highScores = JSON.parse(localStorage.getItem("highScores")) || [];
-    // Chuyển đổi định dạng cũ (chỉ số điểm) sang định dạng mới (đối tượng với tên và điểm)
-    highScores = highScores.map(item => {
-        if (typeof item === "number") {
-            return { name: "Không tên", score: item };
+    try {
+        board = document.getElementById("board");
+        if (!board) {
+            console.error("Canvas element 'board' not found!");
+            return;
         }
-        return item;
-    });
-    
-    // Tải tất cả hình ảnh cho buff
-    loadAllBuffImages();
-    
-    // Hiển thị hộp thoại nhập tên
-    showPlayerNameDialog();
-    
-    // Vòng lặp game sẽ bắt đầu sau khi người chơi nhập tên
-    requestAnimationFrame(update);
-    document.addEventListener("keydown", moveShip);
-    document.addEventListener("keydown", shoot);
+        
+        board.width = boardWidth;
+        board.height = boardHeight;
+        context = board.getContext("2d");
+        
+        if (!context) {
+            console.error("Could not get 2D context from canvas!");
+            return;
+        }
+
+        //load tất cả hình ảnh alien
+        for (let type in alienTypes) {
+            let img = new Image();
+            img.src = alienTypes[type].img;
+            img.onload = function() {
+                console.log(`Loaded alien image: ${type}`);
+                alienTypes[type].imgObject = img;
+            };
+            img.onerror = function() {
+                console.error(`Failed to load alien image: ${type} from ${alienTypes[type].img}`);
+            };
+        }
+
+        shipImg = new Image();
+        shipImg.src = "./ship.png";
+        shipImg.onload = function() {
+            context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
+        }
+
+        aiShipImg = new Image();
+        aiShipImg.src = "./shipAI.png"; // Cập nhật đường dẫn ảnh cho tàu AI
+        aiShipImg.onerror = function() {
+            aiShipImg.src = "./ship.png"; // Fallback nếu không có hình ảnh riêng
+        };
+
+        // Khởi tạo giá trị mặc định cho các thuộc tính của aiShip
+        aiShip.bulletSpeedMultiplier = 1;
+        aiShip.hasMultiShot = false;
+
+        createStars();
+        createAliens();
+        setupGameMenu();
+        
+        // Tải điểm cao từ localStorage và chuyển đổi định dạng cũ nếu cần
+        highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+        // Chuyển đổi định dạng cũ (chỉ số điểm) sang định dạng mới (đối tượng với tên và điểm)
+        highScores = highScores.map(item => {
+            if (typeof item === "number") {
+                return { name: "Không tên", score: item };
+            }
+            return item;
+        });
+        
+        // Tải tất cả hình ảnh cho buff
+        loadAllBuffImages();
+        
+        // Hiển thị hộp thoại nhập tên
+        showPlayerNameDialog();
+        
+        console.log("Game initialized successfully");
+        
+        // Vòng lặp game sẽ bắt đầu sau khi người chơi nhập tên
+        requestAnimationFrame(update);
+        document.addEventListener("keydown", moveShip);
+        document.addEventListener("keydown", shoot);
+        
+        // Khởi tạo biến boss fight
+        boss = null;
+        bossHealth = bossMaxHealth;
+        bossLasers = [];
+        bossLaserTimer = 0;
+        bossLaserCount = 2;
+        isBossFight = false;
+        bossDefeated = false;
+    } catch (error) {
+        console.error("Error in initialization:", error);
+        alert("Có lỗi xảy ra khi khởi tạo game. Vui lòng kiểm tra console để biết thêm chi tiết.");
+    }
 }
 
 
@@ -796,6 +1016,27 @@ function setupGameMenu() {
         }
     });
     menuDiv.appendChild(restartGameButton);
+    
+    // Thêm nút trợ giúp debug vào menu game
+    if (window.location.search.includes('debug=true')) {
+        let debugButton = document.createElement("button");
+        debugButton.textContent = "Debug: Start Boss";
+        debugButton.style.margin = "5px 0";
+        debugButton.style.padding = "5px 10px";
+        debugButton.style.width = "100%";
+        debugButton.style.backgroundColor = "#ff00ff";
+        debugButton.style.color = "white";
+        debugButton.style.border = "none";
+        debugButton.style.cursor = "pointer";
+        
+        debugButton.onclick = function() {
+            console.log("Debug: Manual boss fight activation");
+            alienColumns = 7; // Đủ để kích hoạt boss fight
+            alienCount = 0; // Giả vờ rằng tất cả alien đã bị tiêu diệt
+        };
+        
+        menuDiv.appendChild(debugButton);
+    }
     
     document.body.appendChild(menuDiv);
 }
@@ -971,32 +1212,51 @@ function update() {
         }
         
         // Vẽ boss
-        context.drawImage(boss.img, boss.x, boss.y, boss.width, boss.height);
+        try {
+            if (boss.img && boss.img.complete) {
+                context.drawImage(boss.img, boss.x, boss.y, boss.width, boss.height);
+            } else {
+                // Fallback nếu hình ảnh không được tải
+                context.fillStyle = "red";
+                context.fillRect(boss.x, boss.y, boss.width, boss.height);
+                context.fillStyle = "white";
+                context.font = "20px courier";
+                context.textAlign = "center";
+                context.fillText("BOSS", boss.x + boss.width/2, boss.y + boss.height/2);
+                context.textAlign = "start"; // Reset text align
+            }
+        } catch (e) {
+            console.error("Error drawing boss:", e);
+            // Fallback đơn giản
+            context.fillStyle = "red";
+            context.fillRect(boss.x, boss.y, boss.width, boss.height);
+        }
         
-        // Tạo laser của boss định kỳ
+        // Tăng bộ đếm thời gian để bắn laser
         bossLaserTimer++;
         if (bossLaserTimer >= bossLaserInterval) {
             bossLaserTimer = 0;
             createBossLasers();
         }
         
-        // Cập nhật và vẽ laser của boss
+        // Cập nhật và vẽ các laser
         updateBossLasers();
         
-        // Vẽ thanh máu của boss
+        // Vẽ thanh máu
         drawBossHealthBar();
     } 
     // Xử lý alien bình thường
     else {
-        //tạo wave mới khi hết alien
+        // Tạo wave mới khi hết alien
         if (alienCount == 0) {
             score += alienColumns * alienRows * 100;
             if (aiEnabled && aiShip.active) {
                 aiShip.score += alienColumns * alienRows * 50;
             }
             
-            // Kiểm tra điều kiện để bắt đầu boss fight
-            if (alienColumns >= 7) {
+            // Sửa điều kiện bắt đầu boss fight
+            if (alienColumns >= 6 || level >= 5) { // Giảm số cột xuống 6 hoặc khi đạt cấp độ 5
+                console.log("Starting boss fight, alienColumns =", alienColumns, "level =", level);
                 startBossFight();
             } else {
                 alienColumns = Math.min(alienColumns + 1, columns/2 - 2);
@@ -1102,6 +1362,11 @@ function update() {
                                 frame: 0,
                                 duration: explosionDuration
                             });
+                            
+                            // Rơi buff cho AI với xác suất 20%
+                            if (Math.random() < 0.2 && !buffAIExists) {
+                                spawnBuff(alien.x, alien.y, true); // true = dành cho AI
+                            }
                         }
                         if (!bullet.piercing) bullet.used = true;
                     }
@@ -1199,18 +1464,30 @@ function update() {
         buff.y += buffVelocityY;
         powerUpTypes[buff.type].draw(context, buff.x, buff.y, buff.width, buff.height);
 
-        // Kiểm tra va chạm với tàu người chơi
+        // Chỉ cho phép tàu người chơi nhận buff người chơi
         if (detectCollision(ship, buff)) {
             activateBuff(ship);
-        }
-        // Kiểm tra va chạm với tàu AI
-        else if (aiEnabled && aiShip.active && detectCollision(aiShip, buff)) {
-            activateBuff(aiShip);
         }
 
         if (buff.y > boardHeight) {
             buff = null;
             buffExists = false;
+        }
+    }
+    
+    // Vẽ và xử lý buff AI
+    if (buffAI && aiEnabled) {
+        buffAI.y += buffAIVelocityY;
+        powerUpAITypes[buffAI.type].draw(context, buffAI.x, buffAI.y, buffAI.width, buffAI.height);
+
+        // Chỉ cho phép AI nhận buff AI
+        if (aiShip.active && detectCollision(aiShip, buffAI)) {
+            activateAIBuff();
+        }
+
+        if (buffAI.y > boardHeight) {
+            buffAI = null;
+            buffAIExists = false;
         }
     }
 
@@ -1343,7 +1620,7 @@ function detectCollision(a, b) {
     return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
 
-function spawnBuff(x, y) {
+function spawnBuff(x, y, forAI = false) {
     // Tăng tỉ lệ rơi vật phẩm tăng đạn
     let rand = Math.random();
     let type;
@@ -1352,18 +1629,35 @@ function spawnBuff(x, y) {
         type = "permanentBulletUp";
     } else {
         // 60% còn lại chia đều cho các vật phẩm khác
-        let otherTypes = Object.keys(powerUpTypes).filter(t => t !== "permanentBulletUp");
+        let otherTypes = forAI ?
+            Object.keys(powerUpAITypes).filter(t => t !== "permanentBulletUp") :
+            Object.keys(powerUpTypes).filter(t => t !== "permanentBulletUp");
         type = otherTypes[Math.floor(Math.random() * otherTypes.length)];
     }
     
-    buff = { 
-        x: x,
-        y: y,
-        width: tileSize, // Đảm bảo width của buff là tileSize
-        height: tileSize, // Đảm bảo height của buff là tileSize
-        type: type
-    };
-    buffExists = true;
+    if (forAI) {
+        // Tạo buff cho AI
+        buffAI = { 
+            x: x,
+            y: y,
+            width: tileSize,
+            height: tileSize,
+            type: type,
+            forAI: true
+        };
+        buffAIExists = true;
+    } else {
+        // Tạo buff cho người chơi
+        buff = { 
+            x: x,
+            y: y,
+            width: tileSize,
+            height: tileSize,
+            type: type,
+            forAI: false
+        };
+        buffExists = true;
+    }
 }
 
 function activateBuff(targetShip) {
@@ -1469,18 +1763,106 @@ function activateBuff(targetShip) {
     }
 }
 
+function activateAIBuff() {
+    buffAIExists = false;
+    buffAIActive = true;
+    buffAIType = buffAI.type;
+    
+    let originalAlienVelocity = alienVelocityX; // Lưu tốc độ gốc của alien
+    
+    switch(buffAIType) {
+        case "shield":
+            aiShip.isShieldActive = true;
+            aiShip.shield = 100;
+            setTimeout(() => {
+                aiShip.isShieldActive = false;
+                buffAIActive = false;
+            }, powerUpAITypes.shield.duration);
+            break;
+        
+        case "rapidFire":
+            aiShip.bulletSpeedMultiplier = 2;
+            setTimeout(() => {
+                aiShip.bulletSpeedMultiplier = 1;
+                buffAIActive = false;
+            }, powerUpAITypes.rapidFire.duration);
+            break;
+        
+        case "piercingShot":
+            aiBulletArray.forEach(bullet => bullet.piercing = true);
+            setTimeout(() => {
+                aiBulletArray.forEach(bullet => bullet.piercing = false);
+                buffAIActive = false;
+            }, powerUpAITypes.piercingShot.duration);
+            break;
+        
+        case "multiShot":
+            aiShip.hasMultiShot = true;
+            setTimeout(() => {
+                aiShip.hasMultiShot = false;
+                buffAIActive = false;
+            }, powerUpAITypes.multiShot.duration);
+            break;
+        
+        case "bomb":
+            alienArray.forEach(alien => {
+                if (alien.alive) {
+                    alien.alive = false;
+                    alienCount--;
+                    aiShip.score += alien.type.points;
+                    explosions.push({
+                        x: alien.x,
+                        y: alien.y,
+                        frame: 0,
+                        duration: explosionDuration
+                    });
+                }
+            });
+            buffAIActive = false;
+            break;
+        
+        case "permanentBulletUp":
+            aiShip.bulletCount++;
+            buffAIActive = false;
+            break;
+        
+        case "slowAliens":
+            alienVelocityX *= 0.5; // Giảm một nửa tốc độ
+            setTimeout(() => {
+                alienVelocityX = originalAlienVelocity;
+                buffAIActive = false;
+            }, powerUpAITypes.slowAliens.duration);
+            break;
+    }
+    
+    buffAI = null;
+}
+
 function updateAI() {
     const settings = difficultySettings[aiShip.difficulty];
     
     // Di chuyển AI
     aiShip.shootCooldown--;
     
-    // Kiểm tra xem có buff để nhặt không (chỉ ở mức độ khó)
-    if (settings.seekPowerUps && buff && !buffExists) {
-        const shouldSeekBuff = Math.random() < 0.8; // 80% cơ hội đi lấy buff
-        if (shouldSeekBuff) {
-            const targetX = buff.x;
-            // Di chuyển đến vị trí của buff
+    // AI tìm buff AI dựa theo độ khó
+    if (buffAI && buffAIExists && aiShip.difficulty !== "easy") {
+        // Chỉ ở mức độ medium và hard AI mới đi lấy buff
+        // Ưu tiên đi lấy buff cao nhất
+        const targetX = buffAI.x + buffAI.width/2 - aiShip.width/2;
+        
+        // Di chuyển tàu AI tới vị trí buff
+        if (Math.abs(aiShip.x - targetX) > settings.moveSpeed) {
+            if (aiShip.x < targetX) {
+                aiShip.x += settings.moveSpeed * 1.5; // Tăng tốc độ di chuyển đến buff
+            } else {
+                aiShip.x -= settings.moveSpeed * 1.5;
+            }
+            
+            // Giới hạn không cho tàu đi ra ngoài màn hình
+            aiShip.x = Math.max(0, Math.min(boardWidth - aiShip.width, aiShip.x));
+            
+            // Nếu đang đi lấy buff, không thực hiện hành động khác
+            return;
         }
     }
     
@@ -1566,7 +1948,7 @@ function updateAI() {
         }
     }
     
-    // Né tránh đạn của alien
+    // Né tránh đạn của alien (nhưng ưu tiên thấp hơn di chuyển lấy buff)
     if (aiShip.difficulty !== "easy") {
         for (let i = 0; i < alienBullets.length; i++) {
             let bullet = alienBullets[i];
@@ -1575,26 +1957,9 @@ function updateAI() {
                 bullet.y < aiShip.y && bullet.y > aiShip.y - 100) {
                 // Né sang trái hoặc phải tùy thuộc vào vị trí hiện tại
                 const dodgeDirection = (aiShip.x > boardWidth/2) ? -1 : 1;
-                aiShip.x += settings.moveSpeed * 2 * dodgeDirection;
+                aiShip.x += settings.moveSpeed * dodgeDirection; // Giảm tốc độ né tránh so với ban đầu
                 break;
             }
-        }
-    }
-}
-
-// Thêm hàm mới để AI tránh laser của boss
-function avoidBossLasers(settings) {
-    if (!aiShip.active || aiShip.difficulty === "easy") return;
-    
-    // Chỉ né tránh ở độ khó medium và hard
-    for (let i = 0; i < bossLasers.length; i++) {
-        const laser = bossLasers[i];
-        // Nếu laser sắp va chạm với AI
-        if (Math.abs(laser.x + laser.width/2 - (aiShip.x + aiShip.width/2)) < aiShip.width) {
-            // Di chuyển tránh xa laser
-            const moveDirection = (laser.x > aiShip.x) ? -1 : 1;
-            aiShip.x += settings.moveSpeed * 2 * moveDirection;
-            break;
         }
     }
 }
@@ -1648,20 +2013,52 @@ function findBestTarget(settings) {
 function aiShoot() {
     if (!aiShip.active) return;
     
-    // Bắn đạn dựa trên số lượng đạn của AI
-    for(let i = 0; i < aiShip.bulletCount; i++) {
-        let spreadAngle = (i - (aiShip.bulletCount-1)/2) * 0.15;
-        let bullet = {
-            x: aiShip.x + aiShip.width/2,
-            y: aiShip.y,
-            width: tileSize/8,
-            height: tileSize/2,
-            used: false,
-            piercing: false,
-            velocityX: Math.sin(spreadAngle) * 10,
-            velocityY: bulletVelocityY * Math.cos(spreadAngle)
-        };
-        aiBulletArray.push(bullet);
+    try {
+        // Đảm bảo aiShip.bulletSpeedMultiplier có giá trị
+        if (!aiShip.bulletSpeedMultiplier) aiShip.bulletSpeedMultiplier = 1;
+        
+        // Đảm bảo aiShip.bulletCount có giá trị
+        if (!aiShip.bulletCount || aiShip.bulletCount < 1) aiShip.bulletCount = 1;
+        
+        if (aiShip.hasMultiShot) {
+            // Khi có multiShot, bắn 3 hướng chính
+            let angles = [-0.3, 0, 0.3];
+            angles.forEach(mainAngle => {
+                // Với mỗi hướng chính, bắn số đạn theo aiShip.bulletCount
+                for(let i = 0; i < aiShip.bulletCount; i++) {
+                    let spreadAngle = mainAngle + (i - (aiShip.bulletCount-1)/2) * 0.15;
+                    let bullet = {
+                        x: aiShip.x + aiShip.width/2,
+                        y: aiShip.y,
+                        width: tileSize/8,
+                        height: tileSize/2,
+                        used: false,
+                        piercing: false,
+                        velocityX: Math.sin(spreadAngle) * 10,
+                        velocityY: bulletVelocityY * Math.cos(spreadAngle) * aiShip.bulletSpeedMultiplier
+                    };
+                    aiBulletArray.push(bullet);
+                }
+            });
+        } else {
+            // Bắn thường theo dạng quạt
+            for(let i = 0; i < aiShip.bulletCount; i++) {
+                let spreadAngle = (i - (aiShip.bulletCount-1)/2) * 0.15;
+                let bullet = {
+                    x: aiShip.x + aiShip.width/2,
+                    y: aiShip.y,
+                    width: tileSize/8,
+                    height: tileSize/2,
+                    used: false,
+                    piercing: false,
+                    velocityX: Math.sin(spreadAngle) * 10,
+                    velocityY: bulletVelocityY * Math.cos(spreadAngle) * aiShip.bulletSpeedMultiplier
+                };
+                aiBulletArray.push(bullet);
+            }
+        }
+    } catch (error) {
+        console.error("Error in aiShoot:", error);
     }
 }
 
@@ -1735,6 +2132,14 @@ function resetGame() {
     explosions = [];
     buff = null;
     buffExists = false;
+    buffActive = false;
+    buffType = null;
+    
+    buffAI = null;
+    buffAIExists = false;
+    buffAIActive = false;
+    buffAIType = null;
+    
     alienColumns = 3;
     alienRows = 2;
     alienVelocityX = 0.5;
@@ -1744,6 +2149,8 @@ function resetGame() {
     if (aiEnabled) {
         resetAiShip();
         aiShip.active = true;
+        aiShip.hasMultiShot = false;
+        aiShip.bulletSpeedMultiplier = 1;
     } else {
         aiShip.active = false;
     }
@@ -1805,14 +2212,44 @@ window.addEventListener("keydown", function(e) {
 
 // Hàm khởi tạo boss fight
 function startBossFight() {
-    isBossFight = true;
-    alienArray = []; // Xóa tất cả alien
-    alienBullets = []; // Xóa đạn của alien
+    console.log("Boss fight initialization started");
     
-    // Khởi tạo boss
+    // Đặt cờ boss fight
+    isBossFight = true;
+    
+    // Xóa tất cả alien và đạn 
+    alienArray = [];
+    alienBullets = [];
+    alienCount = 0;
+    
+    // Tạo boss
     let bossImg = new Image();
     bossImg.src = "./boss.png";
     
+    // Xử lý sự kiện tải hình ảnh
+    bossImg.onload = function() {
+        console.log("Boss image loaded successfully");
+    };
+    
+    bossImg.onerror = function() {
+        console.error("Failed to load boss image");
+        
+        // Tạo một canvas để vẽ boss thay thế
+        let canvas = document.createElement('canvas');
+        canvas.width = bossWidth;
+        canvas.height = bossHeight;
+        let ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'red';
+        ctx.fillRect(0, 0, bossWidth, bossHeight);
+        ctx.fillStyle = 'white';
+        ctx.font = '20px Arial';
+        ctx.fillText('BOSS', bossWidth/3, bossHeight/2);
+        
+        // Chuyển canvas thành data URL
+        bossImg.src = canvas.toDataURL();
+    };
+    
+    // Khởi tạo boss với các thuộc tính
     boss = {
         x: boardWidth / 2 - bossWidth / 2,
         y: tileSize * 3,
@@ -1821,81 +2258,146 @@ function startBossFight() {
         img: bossImg
     };
     
+    // Thiết lập các thuộc tính khác cho boss fight
     bossHealth = bossMaxHealth;
     bossLaserTimer = 0;
+    bossLaserCount = 2;
+    bossLasers = [];
+    
+    // Tạo laser đầu tiên ngay lập tức
+    setTimeout(createBossLasers, 2000);
+    
+    console.log("Boss fight initialized:", boss);
 }
 
 // Tạo laser của boss - sửa để bắt đầu với 2 đường laser và tăng dần
 function createBossLasers() {
-    // Tạo số lượng laser tương ứng với bossLaserCount
+    console.log("Creating boss lasers");
+    
+    if (!isBossFight || !boss) {
+        console.log("Cannot create lasers - no active boss fight");
+        return;
+    }
+    
+    // Xóa laser cũ
+    bossLasers = [];
+    
+    // Tạo laser mới dựa trên bossLaserCount
     for (let i = 0; i < bossLaserCount; i++) {
-        let laserX = Math.random() * (boardWidth - bossLaserWidth);
+        // Phân bổ vị trí laser đều trên màn hình
+        let laserX;
         
+        if (bossLaserCount > 1) {
+            // Chia đều khoảng cách
+            const totalWidth = boardWidth - bossLaserWidth;
+            const segment = totalWidth / (bossLaserCount - 1);
+            laserX = i * segment;
+        } else {
+            // Nếu chỉ có 1 laser, đặt ở giữa màn hình
+            laserX = (boardWidth - bossLaserWidth) / 2;
+        }
+        
+        // Thêm một chút ngẫu nhiên
+        laserX += (Math.random() - 0.5) * 30;
+        
+        // Giới hạn trong màn hình
+        laserX = Math.max(0, Math.min(boardWidth - bossLaserWidth, laserX));
+        
+        // Tạo laser mới
         bossLasers.push({
             x: laserX,
             y: 0,
             width: bossLaserWidth,
             height: tileSize,
-            growing: true  // Bắt đầu ở chế độ phát triển
+            growing: true
         });
     }
     
-    // Tăng số lượng laser cho lần bắn tiếp theo
-    bossLaserCount++;
+    // Tăng số lượng laser cho lần sau
+    bossLaserCount = Math.min(bossLaserCount + 1, 10); // Tối đa 10 laser
     
-    // Hiệu ứng cảnh báo trước khi laser xuất hiện
+    // Hiệu ứng cảnh báo
     flashWarning();
+    
+    console.log("Created", bossLasers.length, "boss lasers");
 }
 
-// Hiệu ứng cảnh báo trước khi laser xuất hiện
-function flashWarning() {
-    let warningCount = 3;
-    let warningInterval = setInterval(() => {
-        if (warningCount <= 0) {
-            clearInterval(warningInterval);
-            return;
-        }
+// Sửa lại hàm avoidBossLasers để xử lý đúng
+function avoidBossLasers(settings) {
+    if (!aiShip.active || aiShip.difficulty === "easy") return;
+    
+    // Kiểm tra xem bossLasers có tồn tại và không trống
+    if (!bossLasers || bossLasers.length === 0) return;
+    
+    // Né tránh laser ở độ khó medium và hard
+    for (let i = 0; i < bossLasers.length; i++) {
+        const laser = bossLasers[i];
+        // Nếu laser sắp va chạm với AI (khoảng cách gần hơn)
+        const laserCenterX = laser.x + laser.width/2;
+        const shipCenterX = aiShip.x + aiShip.width/2;
+        const distanceX = Math.abs(laserCenterX - shipCenterX);
         
-        // Nhấp nháy màn hình
-        context.fillStyle = "rgba(255, 0, 0, 0.2)";
-        context.fillRect(0, 0, boardWidth, boardHeight);
-        warningCount--;
-    }, 200);
+        if (distanceX < aiShip.width * 1.2) { // Tăng phạm vi né tránh
+            // Di chuyển tránh xa laser
+            const moveDirection = (laserCenterX > shipCenterX) ? -1 : 1;
+            aiShip.x += settings.moveSpeed * 3 * moveDirection; // Tăng tốc độ né tránh
+            
+            // Giới hạn không cho đi ra ngoài màn hình
+            aiShip.x = Math.max(0, Math.min(boardWidth - aiShip.width, aiShip.x));
+            console.log("AI avoiding laser at", laserCenterX, "moving", moveDirection > 0 ? "right" : "left");
+            break;
+        }
+    }
 }
 
-// Cập nhật và vẽ laser của boss - giảm tốc độ laser
+// Sửa lại hàm updateBossLasers để hiển thị và hoạt động đúng
 function updateBossLasers() {
+    if (!bossLasers || bossLasers.length === 0) return;
+    
     for (let i = bossLasers.length - 1; i >= 0; i--) {
         let laser = bossLasers[i];
         
-        // Nếu đang ở trạng thái phát triển
-        if (laser.growing) {
-            laser.height += 8; // Giảm tốc độ phát triển từ 15 xuống 8
-            
-            // Khi laser đạt đến cuối màn hình
-            if (laser.height >= boardHeight) {
-                laser.growing = false;
-            }
-        } else {
-            // Sau khi đạt chiều cao tối đa, laser bắt đầu mờ đi
+        // Kiểm tra xem laser có hợp lệ không
+        if (!laser) {
             bossLasers.splice(i, 1);
             continue;
         }
         
-        // Vẽ laser
+        // Nếu đang phát triển
+        if (laser.growing) {
+            laser.height += 10; // Tăng tốc độ phát triển
+            
+            // Nếu laser đạt đến cuối màn hình
+            if (laser.height >= boardHeight) {
+                // Giữ ở chiều cao tối đa trong một thời gian trước khi biến mất
+                laser.growing = false;
+                laser.duration = 30; // Duy trì đủ lâu để người chơi thấy
+            }
+        } else {
+            // Giảm thời gian tồn tại
+            laser.duration--;
+            
+            // Nếu hết thời gian, xóa laser
+            if (laser.duration <= 0) {
+                bossLasers.splice(i, 1);
+                continue;
+            }
+        }
+        
+        // Vẽ laser với hiệu ứng gradient
         let gradient = context.createLinearGradient(0, laser.y, 0, laser.y + laser.height);
-        gradient.addColorStop(0, "rgba(255, 0, 0, 0.7)");
+        gradient.addColorStop(0, "rgba(255, 0, 0, 0.8)");
         gradient.addColorStop(0.5, "rgba(255, 255, 0, 0.9)");
-        gradient.addColorStop(1, "rgba(255, 0, 0, 0.7)");
+        gradient.addColorStop(1, "rgba(255, 0, 0, 0.8)");
         
         context.fillStyle = gradient;
         context.fillRect(laser.x, laser.y, laser.width, laser.height);
         
-        // Vẽ hiệu ứng lóe sáng ở giữa laser
+        // Hiệu ứng phát sáng ở giữa
         context.fillStyle = "rgba(255, 255, 255, 0.8)";
         context.fillRect(laser.x + laser.width/4, laser.y, laser.width/2, laser.height);
         
-        // Kiểm tra va chạm với tàu người chơi
+        // Kiểm tra va chạm với người chơi và AI
         if (ship && detectLaserCollision(laser, ship)) {
             if (isShieldActive) {
                 shield -= 50; // Laser gây nhiều sát thương hơn
@@ -1911,7 +2413,6 @@ function updateBossLasers() {
             }
         }
         
-        // Kiểm tra va chạm với tàu AI
         if (aiEnabled && aiShip.active && detectLaserCollision(laser, aiShip)) {
             if (aiShip.isShieldActive) {
                 aiShip.shield -= 50;
@@ -2040,29 +2541,58 @@ function loadAllBuffImages() {
         'slowAliens'
     ];
     
+    // Tải buff cho người chơi
     buffTypes.forEach(type => {
         const img = new Image();
         img.src = `./buffship/${type}.png`;
         
         img.onload = function() {
-            console.log(`Loaded buff image: ${type}`);
+            console.log(`Loaded player buff image: ${type}`);
             powerUpTypes[type].img = img;
         };
         
         img.onerror = function() {
-            console.error(`Failed to load buff image: ${type}`);
+            console.error(`Failed to load player buff image: ${type}`);
             
             // Thử lại với tên file viết thường
             const retryImg = new Image();
             retryImg.src = `./buffship/${type.toLowerCase()}.png`;
             
             retryImg.onload = function() {
-                console.log(`Loaded buff image (lowercase): ${type}`);
+                console.log(`Loaded player buff image (lowercase): ${type}`);
                 powerUpTypes[type].img = retryImg;
             };
             
             retryImg.onerror = function() {
-                console.error(`Failed to load buff image with all attempts: ${type}`);
+                console.error(`Failed to load player buff image with all attempts: ${type}`);
+            };
+        };
+    });
+    
+    // Tải buff cho AI
+    buffTypes.forEach(type => {
+        const img = new Image();
+        img.src = `./buffshipAI/${type}.png`;
+        
+        img.onload = function() {
+            console.log(`Loaded AI buff image: ${type}`);
+            powerUpAITypes[type].img = img;
+        };
+        
+        img.onerror = function() {
+            console.error(`Failed to load AI buff image: ${type}`);
+            
+            // Thử lại với tên file viết thường
+            const retryImg = new Image();
+            retryImg.src = `./buffshipAI/${type.toLowerCase()}.png`;
+            
+            retryImg.onload = function() {
+                console.log(`Loaded AI buff image (lowercase): ${type}`);
+                powerUpAITypes[type].img = retryImg;
+            };
+            
+            retryImg.onerror = function() {
+                console.error(`Failed to load AI buff image with all attempts: ${type}`);
             };
         };
     });
