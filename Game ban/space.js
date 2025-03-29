@@ -89,141 +89,174 @@ let powerUpTypes = {
     shield: { 
         color: "blue", 
         duration: 8000,
+        img: null,
         draw: function(context, x, y, width, height) {
-            context.fillStyle = this.color;
-            context.beginPath();
-            context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
-            context.fill();
-            context.strokeStyle = "white";
-            context.lineWidth = 2;
-            context.stroke();
-            
-            // Vẽ biểu tượng shield
-            context.beginPath();
-            context.moveTo(x + width/2, y + height/4);
-            context.lineTo(x + width*3/4, y + height/2);
-            context.lineTo(x + width/2, y + height*3/4);
-            context.lineTo(x + width/4, y + height/2);
-            context.closePath();
-            context.strokeStyle = "white";
-            context.stroke();
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback vẽ shield nếu không tải được hình ảnh
+                context.fillStyle = this.color;
+                context.beginPath();
+                context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
+                context.fill();
+                context.strokeStyle = "white";
+                context.lineWidth = 2;
+                context.stroke();
+                
+                // Vẽ biểu tượng shield
+                context.beginPath();
+                context.moveTo(x + width/2, y + height/4);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.lineTo(x + width/2, y + height*3/4);
+                context.lineTo(x + width/4, y + height/2);
+                context.closePath();
+                context.strokeStyle = "white";
+                context.stroke();
+            }
         }
     },
     rapidFire: { 
         color: "red", 
         duration: 10000,
+        img: null,
         draw: function(context, x, y, width, height) {
-            context.fillStyle = this.color;
-            context.fillRect(x, y, width, height);
-
-            // Vẽ biểu tượng lightning
-            context.beginPath();
-            context.moveTo(x + width/2, y + height/4);
-            context.lineTo(x + width*3/4, y + height/2);
-            context.lineTo(x + width/2, y + height/2);
-            context.lineTo(x + width*3/4, y + height*3/4);
-            context.strokeStyle = "yellow";
-            context.lineWidth = 2;
-            context.stroke();
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                context.beginPath();
+                context.moveTo(x + width/2, y + height/4);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.lineTo(x + width/2, y + height/2);
+                context.lineTo(x + width*3/4, y + height*3/4);
+                context.strokeStyle = "yellow";
+                context.lineWidth = 2;
+                context.stroke();
+            }
         }
     },
     piercingShot: { 
         color: "purple", 
         duration: 12000,
+        img: null,
         draw: function(context, x, y, width, height) {
-            context.fillStyle = this.color;
-            context.fillRect(x, y, width, height);
-            
-            // Vẽ biểu tượng mũi tên xuyên
-            context.beginPath();
-            context.moveTo(x + width/4, y + height/2);
-            context.lineTo(x + width*3/4, y + height/2);
-            context.moveTo(x + width*2/3, y + height/3);
-            context.lineTo(x + width*3/4, y + height/2);
-            context.lineTo(x + width*2/3, y + height*2/3);
-            context.strokeStyle = "white";
-            context.lineWidth = 2;
-            context.stroke();
-        }
-    },
-    bomb: { 
-        color: "orange", 
-        duration: 0,
-        draw: function(context, x, y, width, height) {
-            context.fillStyle = this.color;
-            context.beginPath();
-            context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
-            context.fill();
-            
-            // Vẽ biểu tượng bom
-            context.beginPath();
-            context.moveTo(x + width/2, y + height/4);
-            context.lineTo(x + width/2, y + height*3/4);
-            context.moveTo(x + width/4, y + height/2);
-            context.lineTo(x + width*3/4, y + height/2);
-            context.strokeStyle = "black";
-            context.lineWidth = 3;
-            context.stroke();
-        }
-    },
-    multiShot: {
-        color: "green",
-        duration: 8000,
-        draw: function(context, x, y, width, height) {
-            context.fillStyle = this.color;
-            context.fillRect(x, y, width, height);
-            
-            // Vẽ biểu tượng 3 mũi tên
-            for(let i = 0; i < 3; i++) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
                 context.beginPath();
-                context.moveTo(x + width*(i+1)/4, y + height*3/4);
-                context.lineTo(x + width*(i+1)/4, y + height/4);
-                context.lineTo(x + width*(i+0.7)/4, y + height/3);
-                context.moveTo(x + width*(i+1)/4, y + height/4);
-                context.lineTo(x + width*(i+1.3)/4, y + height/3);
+                context.moveTo(x + width/4, y + height/2);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.moveTo(x + width*2/3, y + height/3);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.lineTo(x + width*2/3, y + height*2/3);
                 context.strokeStyle = "white";
                 context.lineWidth = 2;
                 context.stroke();
             }
         }
     },
+    bomb: { 
+        color: "orange", 
+        duration: 0,
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.beginPath();
+                context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
+                context.fill();
+                context.beginPath();
+                context.moveTo(x + width/2, y + height/4);
+                context.lineTo(x + width/2, y + height*3/4);
+                context.moveTo(x + width/4, y + height/2);
+                context.lineTo(x + width*3/4, y + height/2);
+                context.strokeStyle = "black";
+                context.lineWidth = 3;
+                context.stroke();
+            }
+        }
+    },
+    multiShot: {
+        color: "green",
+        duration: 8000,
+        img: null,
+        draw: function(context, x, y, width, height) {
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                for(let i = 0; i < 3; i++) {
+                    context.beginPath();
+                    context.moveTo(x + width*(i+1)/4, y + height*3/4);
+                    context.lineTo(x + width*(i+1)/4, y + height/4);
+                    context.lineTo(x + width*(i+0.7)/4, y + height/3);
+                    context.moveTo(x + width*(i+1)/4, y + height/4);
+                    context.lineTo(x + width*(i+1.3)/4, y + height/3);
+                    context.strokeStyle = "white";
+                    context.lineWidth = 2;
+                    context.stroke();
+                }
+            }
+        }
+    },
     permanentBulletUp: {
         color: "cyan",
         duration: 0, // Vĩnh viễn
+        img: null,
         draw: function(context, x, y, width, height) {
-            context.fillStyle = this.color;
-            context.fillRect(x, y, width, height);
-            
-            // Vẽ biểu tượng +1
-            context.fillStyle = "white";
-            context.font = "20px courier";
-            context.fillText("+1", x + width/4, y + height*2/3);
-            
-            // Vẽ viên đạn
-            context.fillStyle = "yellow";
-            context.fillRect(x + width/4, y + height/4, width/2, height/3);
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                context.fillStyle = "white";
+                context.font = "20px courier";
+                context.fillText("+1", x + width/4, y + height*2/3);
+                context.fillStyle = "yellow";
+                context.fillRect(x + width/4, y + height/4, width/2, height/3);
+            }
         }
     },
     slowAliens: {
         color: "lightblue",
         duration: 15000,
+        img: null,
         draw: function(context, x, y, width, height) {
-            context.fillStyle = this.color;
-            context.fillRect(x, y, width, height);
-            
-            // Vẽ biểu tượng đồng hồ
-            context.beginPath();
-            context.arc(x + width/2, y + height/2, width/3, 0, Math.PI * 2);
-            context.strokeStyle = "white";
-            context.lineWidth = 2;
-            context.stroke();
-            
-            // Vẽ kim đồng hồ
-            context.beginPath();
-            context.moveTo(x + width/2, y + height/2);
-            context.lineTo(x + width/2, y + height/3);
-            context.strokeStyle = "white";
-            context.stroke();
+            if (this.img) {
+                // Vẽ với kích thước cố định bằng tileSize
+                context.drawImage(this.img, x, y, tileSize, tileSize);
+            } else {
+                // Fallback drawing
+                context.fillStyle = this.color;
+                context.fillRect(x, y, width, height);
+                context.beginPath();
+                context.arc(x + width/2, y + height/2, width/3, 0, Math.PI * 2);
+                context.strokeStyle = "white";
+                context.lineWidth = 2;
+                context.stroke();
+                context.beginPath();
+                context.moveTo(x + width/2, y + height/2);
+                context.lineTo(x + width/2, y + height/3);
+                context.strokeStyle = "white";
+                context.stroke();
+            }
         }
     }
 };
@@ -614,6 +647,9 @@ window.onload = function() {
         }
         return item;
     });
+    
+    // Tải tất cả hình ảnh cho buff
+    loadAllBuffImages();
     
     // Hiển thị hộp thoại nhập tên
     showPlayerNameDialog();
@@ -1323,8 +1359,8 @@ function spawnBuff(x, y) {
     buff = { 
         x: x,
         y: y,
-        width: tileSize,
-        height: tileSize,
+        width: tileSize, // Đảm bảo width của buff là tileSize
+        height: tileSize, // Đảm bảo height của buff là tileSize
         type: type
     };
     buffExists = true;
@@ -1989,4 +2025,45 @@ function updateExplosions() {
             }
         }
     }
+}
+
+// Thêm hàm để tải tất cả hình ảnh buff
+function loadAllBuffImages() {
+    // Danh sách các loại buff cần tải
+    const buffTypes = [
+        'shield',
+        'rapidFire',
+        'piercingShot',
+        'multiShot',
+        'bomb',
+        'permanentBulletUp',
+        'slowAliens'
+    ];
+    
+    buffTypes.forEach(type => {
+        const img = new Image();
+        img.src = `./buffship/${type}.png`;
+        
+        img.onload = function() {
+            console.log(`Loaded buff image: ${type}`);
+            powerUpTypes[type].img = img;
+        };
+        
+        img.onerror = function() {
+            console.error(`Failed to load buff image: ${type}`);
+            
+            // Thử lại với tên file viết thường
+            const retryImg = new Image();
+            retryImg.src = `./buffship/${type.toLowerCase()}.png`;
+            
+            retryImg.onload = function() {
+                console.log(`Loaded buff image (lowercase): ${type}`);
+                powerUpTypes[type].img = retryImg;
+            };
+            
+            retryImg.onerror = function() {
+                console.error(`Failed to load buff image with all attempts: ${type}`);
+            };
+        };
+    });
 }
