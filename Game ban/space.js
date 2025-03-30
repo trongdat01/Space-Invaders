@@ -493,6 +493,12 @@ let aiBulletArray = [];
 // Thêm biến playerName 
 let playerName = "Player";
 
+// Thêm biến mới để theo dõi trạng thái versus
+let versusResult = null; // Giá trị: "win", "lose", hoặc null
+
+// Thêm biến để theo dõi cách kết thúc game trong chế độ single player
+let singlePlayerResult = null; // Giá trị: "win", "lose", hoặc null
+
 // Thêm hàm hiển thị hộp thoại nhập tên người chơi
 function showPlayerNameDialog() {
     // Tạo lớp phủ nền
@@ -1173,7 +1179,7 @@ window.onload = function() {
 
 // Thêm event listener cho phím Enter để bắt đầu lại game giống với nút "Bắt đầu lại"
 window.addEventListener("keydown", function(e) {
-    if (e.key === "Enter" && (gameOver || bossDefeated)) {
+    if (e.key === "Enter" && (gameOver || bossDefeated || versusResult)) {
         // Hiển thị hộp thoại xác nhận
         if (confirm("Bạn có chắc muốn bắt đầu lại trò chơi? Điểm hiện tại sẽ bị mất.")) {
             showPlayerNameDialog();
@@ -1334,18 +1340,19 @@ function setupGameMenu() {
 function update() {
     requestAnimationFrame(update);
 
-    if (gameOver) {
+    // Xử lý màn hình game over trong chế độ single player
+    if (gameOver && !aiEnabled) {
         context.fillStyle = "black";
         context.fillRect(0, 0, boardWidth, boardHeight);
         
-        // Vẽ các ngôi sao làm nền cho màn hình game over
+        // Vẽ các ngôi sao làm nền
         stars.forEach(star => {
             context.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
             context.beginPath();
             context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
             context.fill();
             
-            // Di chuyển sao chậm hơn khi game over
+            // Di chuyển sao chậm hơn
             star.y += star.speed * 0.3;
             if(star.y > boardHeight) {
                 star.y = 0;
@@ -1353,18 +1360,19 @@ function update() {
             }
         });
         
-        context.fillStyle = "white";
-        context.font = "32px courier";
-        context.fillText("GAME OVER", boardWidth/2 - 80, boardHeight/2 - 80);
+        // Hiển thị thông báo game over
+        context.fillStyle = "#ff0000"; // Màu đỏ cho thất bại
+        context.font = "32px courier bold";
+        context.fillText("BẠN ĐÃ BỊ TIÊU DIỆT", boardWidth/2 - 180, boardHeight/2 - 80);
         
         context.font = "16px courier";
         // Hiển thị điểm và tên người chơi
         context.fillText(playerName + ": " + score + " điểm", boardWidth/2 - 100, boardHeight/2 - 40);
         
         // Hiển thị top 5 điểm cao với kiểm tra hợp lệ
+        context.fillStyle = "white";
         context.fillText("High Scores:", boardWidth/2 - 100, boardHeight/2);
         
-        // Đảm bảo highScores là một mảng hợp lệ
         if (Array.isArray(highScores)) {
             for (let i = 0; i < Math.min(5, highScores.length); i++) {
                 let displayText;
@@ -1387,20 +1395,20 @@ function update() {
         
         return;
     }
-
-    // Hiển thị màn hình victory khi boss bị đánh bại
-    if (bossDefeated) {
+    
+    // Xử lý màn hình kết quả versus khi có kết quả
+    if (aiEnabled && (versusResult || gameOver)) {
         context.fillStyle = "black";
         context.fillRect(0, 0, boardWidth, boardHeight);
         
-        // Vẽ các ngôi sao làm nền cho màn hình victory
+        // Vẽ các ngôi sao làm nền
         stars.forEach(star => {
             context.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
             context.beginPath();
             context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
             context.fill();
             
-            // Di chuyển sao chậm hơn khi victory
+            // Di chuyển sao chậm hơn
             star.y += star.speed * 0.3;
             if(star.y > boardHeight) {
                 star.y = 0;
@@ -1408,18 +1416,96 @@ function update() {
             }
         });
         
-        context.fillStyle = "#00ff00"; // Màu xanh lá cho victory
-        context.font = "48px courier bold";
-        context.fillText("VICTORY!", boardWidth/2 - 120, boardHeight/2 - 50);
+        // Hiển thị tiêu đề thắng/thua
+        let resultText, resultColor;
+        if (versusResult === "win") {
+            resultText = "BẠN ĐÃ THẮNG";
+            resultColor = "#00ff00"; // Màu xanh lá cho chiến thắng
+        } else {
+            resultText = "BẠN ĐÃ THUA";
+            resultColor = "#ff0000"; // Màu đỏ cho thất bại
+        }
         
+        context.fillStyle = resultColor;
+        context.font = "48px courier bold";
+        context.textAlign = "center";
+        context.fillText(resultText, boardWidth/2, boardHeight/2 - 80);
+        context.textAlign = "start"; // Reset text align
+        
+        // Hiển thị điểm số của người chơi và AI
         context.fillStyle = "white";
         context.font = "20px courier";
-        context.fillText("Điểm của bạn: " + score, boardWidth/2 - 100, boardHeight/2);
+        context.textAlign = "center";
+        context.fillText(`${playerName}: ${score} điểm`, boardWidth/2, boardHeight/2);
+        context.fillText(`AI: ${aiShip.score} điểm`, boardWidth/2, boardHeight/2 + 30);
+        context.textAlign = "start"; // Reset text align
+        
+        // Hiển thị chênh lệch điểm số
+        let scoreDiff = Math.abs(score - aiShip.score);
+        let leadingText = score > aiShip.score ? 
+                           `Bạn dẫn trước ${scoreDiff} điểm` : 
+                           `AI dẫn trước ${scoreDiff} điểm`;
+        
+        if (score === aiShip.score) leadingText = "Hòa điểm";
+        
+        context.fillStyle = "#f0c808"; // Màu vàng
+        context.font = "16px courier";
+        context.textAlign = "center";
+        context.fillText(leadingText, boardWidth/2, boardHeight/2 + 60);
+        context.textAlign = "start"; // Reset text align
         
         // Hiển thị thông báo về nút restart và phím Enter
         context.fillStyle = "yellow";
         context.font = "16px courier";
-        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth/2 - 230, boardHeight/2 + 50);
+        context.textAlign = "center";
+        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth/2, boardHeight/2 + 100);
+        context.textAlign = "start"; // Reset text align
+        
+        // Cập nhật điểm cao nếu chưa cập nhật
+        updateHighScores();
+        
+        return;
+    }
+
+    // Hiển thị màn hình victory khi boss bị đánh bại trong chế độ single player
+    if (bossDefeated && !aiEnabled) {
+        context.fillStyle = "black";
+        context.fillRect(0, 0, boardWidth, boardHeight);
+        
+        // Vẽ các ngôi sao làm nền
+        stars.forEach(star => {
+            context.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
+            context.beginPath();
+            context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            context.fill();
+            
+            // Di chuyển sao chậm hơn
+            star.y += star.speed * 0.3;
+            if(star.y > boardHeight) {
+                star.y = 0;
+                star.x = Math.random() * boardWidth;
+            }
+        });
+        
+        // Thay "VICTORY!" bằng "BẠN ĐÃ THẮNG"
+        context.fillStyle = "#00ff00"; // Màu xanh lá cho chiến thắng
+        context.font = "48px courier bold";
+        context.textAlign = "center";
+        context.fillText("BẠN ĐÃ THẮNG", boardWidth/2, boardHeight/2 - 50);
+        context.textAlign = "start"; // Reset text align
+        
+        context.fillStyle = "white";
+        context.font = "20px courier";
+        context.textAlign = "center";
+        context.fillText("Điểm của bạn: " + score, boardWidth/2, boardHeight/2);
+        context.textAlign = "start"; // Reset text align
+        
+        // Hiển thị thông báo về nút restart và phím Enter
+        context.fillStyle = "yellow";
+        context.font = "16px courier";
+        context.textAlign = "center";
+        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth/2, boardHeight/2 + 50);
+        context.textAlign = "start"; // Reset text align
         
         return;
     }
@@ -1496,7 +1582,10 @@ function update() {
                 });
             }
 
-            if (alien.y >= ship.y) gameOver = true;
+            if (alien.y >= ship.y) {
+                gameOver = true;
+                singlePlayerResult = "lose";
+            }
             updateHighScores();
         }
     }
@@ -1623,10 +1712,24 @@ function update() {
             // Kiểm tra nếu boss bị tiêu diệt
             if (bossHealth <= 0) {
                 // Boss bị đánh bại
-                score += 100000; // Cộng điểm khi đánh bại boss
                 createBossExplosion(); // Tạo hiệu ứng nổ lớn
+                
+                if (aiEnabled) {
+                    // Trong chế độ versus, quyết định thắng thua dựa vào điểm số
+                    versusResult = (score >= aiShip.score) ? "win" : "lose";
+                    
+                    // Nếu điểm bằng nhau thì người chơi thắng
+                    if (score === aiShip.score) {
+                        versusResult = "win";
+                    }
+                } else {
+                    // Chế độ single player
+                    score += 100000; // Cộng điểm khi đánh bại boss
+                    bossDefeated = true;
+                    singlePlayerResult = "win";
+                }
+                
                 boss = null;
-                bossDefeated = true;
                 updateHighScores();
             }
         }
@@ -1690,11 +1793,24 @@ function update() {
                 // Kiểm tra nếu boss bị tiêu diệt
                 if (bossHealth <= 0) {
                     // Boss bị đánh bại
-                    score += 50000; // Player được một nửa điểm
-                    aiShip.score += 50000; // AI được một nửa điểm
                     createBossExplosion(); // Tạo hiệu ứng nổ lớn
+                    
+                    if (aiEnabled) {
+                        // Trong chế độ versus, quyết định thắng thua dựa vào điểm số
+                        versusResult = (score >= aiShip.score) ? "win" : "lose";
+                        
+                        // Nếu điểm bằng nhau thì người chơi thắng
+                        if (score === aiShip.score) {
+                            versusResult = "win";
+                        }
+                    } else {
+                        // Chế độ single player
+                        score += 100000; // Cộng điểm khi đánh bại boss
+                        bossDefeated = true;
+                        singlePlayerResult = "win";
+                    }
+                    
                     boss = null;
-                    bossDefeated = true;
                     updateHighScores();
                 }
             }
@@ -1713,7 +1829,7 @@ function update() {
         context.fillStyle = "red";
         context.fillRect(bullet.x, bullet.y, bullet.width, bullet.height);
 
-        //kiểm tra va chạm với tàu
+        //kiểm tra va chạm với tàu người chơi
         if (detectCollision(bullet, ship)) {
             if (isShieldActive) {
                 shield -= 20;
@@ -1723,7 +1839,20 @@ function update() {
             } else {
                 lives--;
                 if (lives <= 0) {
-                    gameOver = true;
+                    if (aiEnabled) {
+                        // Nếu người chơi bị tiêu diệt trong chế độ versus
+                        if (aiShip.lives > 0) {
+                            // AI vẫn còn sống, người chơi thua
+                            versusResult = "lose";
+                        } else {
+                            // Cả hai đã bị tiêu diệt, so sánh điểm
+                            versusResult = (score >= aiShip.score) ? "win" : "lose";
+                        }
+                    } else {
+                        // Nếu ở chế độ single player
+                        gameOver = true;
+                        singlePlayerResult = "lose";
+                    }
                     updateHighScores();
                 }
             }
@@ -1740,6 +1869,15 @@ function update() {
                 aiShip.lives--;
                 if (aiShip.lives <= 0) {
                     aiShip.active = false;
+                    
+                    // Nếu AI bị tiêu diệt
+                    if (lives > 0) {
+                        // Người chơi vẫn còn sống, người chơi thắng
+                        versusResult = "win";
+                    } else {
+                        // Cả hai đã bị tiêu diệt, so sánh điểm
+                        versusResult = (score >= aiShip.score) ? "win" : "lose";
+                    }
                 }
             }
             alienBullets.splice(i, 1);
@@ -2610,6 +2748,10 @@ function resetGame() {
     bossLaserCount = 2; // Reset lại số lượng laser ban đầu
     isBossFight = false;
     bossDefeated = false;
+    
+    // Reset versusResult và các biến kết quả khác
+    versusResult = null;
+    singlePlayerResult = null;
 }
 
 //thêm event listener cho phím R để restart game
@@ -2846,7 +2988,20 @@ function updateBossLasers() {
             } else {
                 lives--;
                 if (lives <= 0) {
-                    gameOver = true;
+                    if (aiEnabled) {
+                        // Nếu người chơi bị tiêu diệt trong chế độ versus
+                        if (aiShip.lives > 0) {
+                            // AI vẫn còn sống, người chơi thua
+                            versusResult = "lose";
+                        } else {
+                            // Cả hai đã bị tiêu diệt, so sánh điểm
+                            versusResult = (score >= aiShip.score) ? "win" : "lose";
+                        }
+                    } else {
+                        // Nếu ở chế độ single player
+                        gameOver = true;
+                        singlePlayerResult = "lose";
+                    }
                     updateHighScores();
                 }
             }
@@ -2862,6 +3017,15 @@ function updateBossLasers() {
                 aiShip.lives--;
                 if (aiShip.lives <= 0) {
                     aiShip.active = false;
+                    
+                    // Nếu AI bị tiêu diệt
+                    if (lives > 0) {
+                        // Người chơi vẫn còn sống, người chơi thắng
+                        versusResult = "win";
+                    } else {
+                        // Cả hai đã bị tiêu diệt, so sánh điểm
+                        versusResult = (score >= aiShip.score) ? "win" : "lose";
+                    }
                 }
             }
         }
