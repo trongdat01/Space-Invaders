@@ -9,16 +9,16 @@ let boardHeight = tileSize * rows;
 let context;
 
 //ship
-let shipWidth = tileSize*2;
+let shipWidth = tileSize * 2;
 let shipHeight = tileSize;
-let shipX = tileSize * columns/2 - tileSize;
-let shipY = tileSize * rows - tileSize*2;
+let shipX = tileSize * columns / 2 - tileSize;
+let shipY = tileSize * rows - tileSize * 2;
 
 let ship = {
-    x : shipX,
-    y : shipY,
-    width : shipWidth,
-    height : shipHeight
+    x: shipX,
+    y: shipY,
+    width: shipWidth,
+    height: shipHeight
 }
 
 let shipImg;
@@ -26,7 +26,7 @@ let shipVelocityX = tileSize;
 
 //aliens
 let alienArray = [];
-let alienWidth = tileSize*2;
+let alienWidth = tileSize * 2;
 let alienHeight = tileSize;
 let alienX = tileSize;
 let alienY = tileSize;
@@ -93,11 +93,11 @@ let gameMode = "single"; // "single" or "versus"
 
 //power ups
 let powerUpTypes = {
-    shield: { 
-        color: "blue", 
+    shield: {
+        color: "blue",
         duration: 8000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -105,29 +105,29 @@ let powerUpTypes = {
                 // Fallback vẽ shield nếu không tải được hình ảnh
                 context.fillStyle = this.color;
                 context.beginPath();
-                context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
+                context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
                 context.fill();
                 context.strokeStyle = "white";
                 context.lineWidth = 2;
                 context.stroke();
-                
+
                 // Vẽ biểu tượng shield
                 context.beginPath();
-                context.moveTo(x + width/2, y + height/4);
-                context.lineTo(x + width*3/4, y + height/2);
-                context.lineTo(x + width/2, y + height*3/4);
-                context.lineTo(x + width/4, y + height/2);
+                context.moveTo(x + width / 2, y + height / 4);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
+                context.lineTo(x + width / 2, y + height * 3 / 4);
+                context.lineTo(x + width / 4, y + height / 2);
                 context.closePath();
                 context.strokeStyle = "white";
                 context.stroke();
             }
         }
     },
-    rapidFire: { 
-        color: "red", 
+    rapidFire: {
+        color: "red",
         duration: 10000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -136,21 +136,21 @@ let powerUpTypes = {
                 context.fillStyle = this.color;
                 context.fillRect(x, y, width, height);
                 context.beginPath();
-                context.moveTo(x + width/2, y + height/4);
-                context.lineTo(x + width*3/4, y + height/2);
-                context.lineTo(x + width/2, y + height/2);
-                context.lineTo(x + width*3/4, y + height*3/4);
+                context.moveTo(x + width / 2, y + height / 4);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
+                context.lineTo(x + width / 2, y + height / 2);
+                context.lineTo(x + width * 3 / 4, y + height * 3 / 4);
                 context.strokeStyle = "yellow";
                 context.lineWidth = 2;
                 context.stroke();
             }
         }
     },
-    piercingShot: { 
-        color: "purple", 
+    piercingShot: {
+        color: "purple",
         duration: 12000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -159,22 +159,22 @@ let powerUpTypes = {
                 context.fillStyle = this.color;
                 context.fillRect(x, y, width, height);
                 context.beginPath();
-                context.moveTo(x + width/4, y + height/2);
-                context.lineTo(x + width*3/4, y + height/2);
-                context.moveTo(x + width*2/3, y + height/3);
-                context.lineTo(x + width*3/4, y + height/2);
-                context.lineTo(x + width*2/3, y + height*2/3);
+                context.moveTo(x + width / 4, y + height / 2);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
+                context.moveTo(x + width * 2 / 3, y + height / 3);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
+                context.lineTo(x + width * 2 / 3, y + height * 2 / 3);
                 context.strokeStyle = "white";
                 context.lineWidth = 2;
                 context.stroke();
             }
         }
     },
-    bomb: { 
-        color: "orange", 
+    bomb: {
+        color: "orange",
         duration: 0,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -182,13 +182,13 @@ let powerUpTypes = {
                 // Fallback drawing
                 context.fillStyle = this.color;
                 context.beginPath();
-                context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
+                context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
                 context.fill();
                 context.beginPath();
-                context.moveTo(x + width/2, y + height/4);
-                context.lineTo(x + width/2, y + height*3/4);
-                context.moveTo(x + width/4, y + height/2);
-                context.lineTo(x + width*3/4, y + height/2);
+                context.moveTo(x + width / 2, y + height / 4);
+                context.lineTo(x + width / 2, y + height * 3 / 4);
+                context.moveTo(x + width / 4, y + height / 2);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
                 context.strokeStyle = "black";
                 context.lineWidth = 3;
                 context.stroke();
@@ -199,7 +199,7 @@ let powerUpTypes = {
         color: "green",
         duration: 8000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -207,13 +207,13 @@ let powerUpTypes = {
                 // Fallback drawing
                 context.fillStyle = this.color;
                 context.fillRect(x, y, width, height);
-                for(let i = 0; i < 3; i++) {
+                for (let i = 0; i < 3; i++) {
                     context.beginPath();
-                    context.moveTo(x + width*(i+1)/4, y + height*3/4);
-                    context.lineTo(x + width*(i+1)/4, y + height/4);
-                    context.lineTo(x + width*(i+0.7)/4, y + height/3);
-                    context.moveTo(x + width*(i+1)/4, y + height/4);
-                    context.lineTo(x + width*(i+1.3)/4, y + height/3);
+                    context.moveTo(x + width * (i + 1) / 4, y + height * 3 / 4);
+                    context.lineTo(x + width * (i + 1) / 4, y + height / 4);
+                    context.lineTo(x + width * (i + 0.7) / 4, y + height / 3);
+                    context.moveTo(x + width * (i + 1) / 4, y + height / 4);
+                    context.lineTo(x + width * (i + 1.3) / 4, y + height / 3);
                     context.strokeStyle = "white";
                     context.lineWidth = 2;
                     context.stroke();
@@ -225,7 +225,7 @@ let powerUpTypes = {
         color: "cyan",
         duration: 0, // Vĩnh viễn
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -235,9 +235,9 @@ let powerUpTypes = {
                 context.fillRect(x, y, width, height);
                 context.fillStyle = "white";
                 context.font = "20px courier";
-                context.fillText("+1", x + width/4, y + height*2/3);
+                context.fillText("+1", x + width / 4, y + height * 2 / 3);
                 context.fillStyle = "yellow";
-                context.fillRect(x + width/4, y + height/4, width/2, height/3);
+                context.fillRect(x + width / 4, y + height / 4, width / 2, height / 3);
             }
         }
     },
@@ -245,7 +245,7 @@ let powerUpTypes = {
         color: "lightblue",
         duration: 15000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -254,13 +254,13 @@ let powerUpTypes = {
                 context.fillStyle = this.color;
                 context.fillRect(x, y, width, height);
                 context.beginPath();
-                context.arc(x + width/2, y + height/2, width/3, 0, Math.PI * 2);
+                context.arc(x + width / 2, y + height / 2, width / 3, 0, Math.PI * 2);
                 context.strokeStyle = "white";
                 context.lineWidth = 2;
                 context.stroke();
                 context.beginPath();
-                context.moveTo(x + width/2, y + height/2);
-                context.lineTo(x + width/2, y + height/3);
+                context.moveTo(x + width / 2, y + height / 2);
+                context.lineTo(x + width / 2, y + height / 3);
                 context.strokeStyle = "white";
                 context.stroke();
             }
@@ -270,11 +270,11 @@ let powerUpTypes = {
 
 // Power-up riêng cho AI
 let powerUpAITypes = {
-    shield: { 
-        color: "blue", 
+    shield: {
+        color: "blue",
         duration: 8000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -282,29 +282,29 @@ let powerUpAITypes = {
                 // Fallback vẽ shield nếu không tải được hình ảnh
                 context.fillStyle = this.color;
                 context.beginPath();
-                context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
+                context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
                 context.fill();
                 context.strokeStyle = "red"; // Màu đỏ để phân biệt với buff người chơi
                 context.lineWidth = 2;
                 context.stroke();
-                
+
                 // Vẽ biểu tượng shield
                 context.beginPath();
-                context.moveTo(x + width/2, y + height/4);
-                context.lineTo(x + width*3/4, y + height/2);
-                context.lineTo(x + width/2, y + height*3/4);
-                context.lineTo(x + width/4, y + height/2);
+                context.moveTo(x + width / 2, y + height / 4);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
+                context.lineTo(x + width / 2, y + height * 3 / 4);
+                context.lineTo(x + width / 4, y + height / 2);
                 context.closePath();
                 context.strokeStyle = "red";
                 context.stroke();
             }
         }
     },
-    rapidFire: { 
-        color: "red", 
+    rapidFire: {
+        color: "red",
         duration: 10000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -313,21 +313,21 @@ let powerUpAITypes = {
                 context.fillStyle = this.color;
                 context.fillRect(x, y, width, height);
                 context.beginPath();
-                context.moveTo(x + width/2, y + height/4);
-                context.lineTo(x + width*3/4, y + height/2);
-                context.lineTo(x + width/2, y + height/2);
-                context.lineTo(x + width*3/4, y + height*3/4);
+                context.moveTo(x + width / 2, y + height / 4);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
+                context.lineTo(x + width / 2, y + height / 2);
+                context.lineTo(x + width * 3 / 4, y + height * 3 / 4);
                 context.strokeStyle = "red";
                 context.lineWidth = 2;
                 context.stroke();
             }
         }
     },
-    piercingShot: { 
-        color: "purple", 
+    piercingShot: {
+        color: "purple",
         duration: 12000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -336,22 +336,22 @@ let powerUpAITypes = {
                 context.fillStyle = this.color;
                 context.fillRect(x, y, width, height);
                 context.beginPath();
-                context.moveTo(x + width/4, y + height/2);
-                context.lineTo(x + width*3/4, y + height/2);
-                context.moveTo(x + width*2/3, y + height/3);
-                context.lineTo(x + width*3/4, y + height/2);
-                context.lineTo(x + width*2/3, y + height*2/3);
+                context.moveTo(x + width / 4, y + height / 2);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
+                context.moveTo(x + width * 2 / 3, y + height / 3);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
+                context.lineTo(x + width * 2 / 3, y + height * 2 / 3);
                 context.strokeStyle = "red";
                 context.lineWidth = 2;
                 context.stroke();
             }
         }
     },
-    bomb: { 
-        color: "orange", 
+    bomb: {
+        color: "orange",
         duration: 0,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -359,13 +359,13 @@ let powerUpAITypes = {
                 // Fallback drawing
                 context.fillStyle = this.color;
                 context.beginPath();
-                context.arc(x + width/2, y + height/2, width/2, 0, Math.PI * 2);
+                context.arc(x + width / 2, y + height / 2, width / 2, 0, Math.PI * 2);
                 context.fill();
                 context.beginPath();
-                context.moveTo(x + width/2, y + height/4);
-                context.lineTo(x + width/2, y + height*3/4);
-                context.moveTo(x + width/4, y + height/2);
-                context.lineTo(x + width*3/4, y + height/2);
+                context.moveTo(x + width / 2, y + height / 4);
+                context.lineTo(x + width / 2, y + height * 3 / 4);
+                context.moveTo(x + width / 4, y + height / 2);
+                context.lineTo(x + width * 3 / 4, y + height / 2);
                 context.strokeStyle = "red";
                 context.lineWidth = 3;
                 context.stroke();
@@ -376,7 +376,7 @@ let powerUpAITypes = {
         color: "green",
         duration: 8000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -384,13 +384,13 @@ let powerUpAITypes = {
                 // Fallback drawing
                 context.fillStyle = this.color;
                 context.fillRect(x, y, width, height);
-                for(let i = 0; i < 3; i++) {
+                for (let i = 0; i < 3; i++) {
                     context.beginPath();
-                    context.moveTo(x + width*(i+1)/4, y + height*3/4);
-                    context.lineTo(x + width*(i+1)/4, y + height/4);
-                    context.lineTo(x + width*(i+0.7)/4, y + height/3);
-                    context.moveTo(x + width*(i+1)/4, y + height/4);
-                    context.lineTo(x + width*(i+1.3)/4, y + height/3);
+                    context.moveTo(x + width * (i + 1) / 4, y + height * 3 / 4);
+                    context.lineTo(x + width * (i + 1) / 4, y + height / 4);
+                    context.lineTo(x + width * (i + 0.7) / 4, y + height / 3);
+                    context.moveTo(x + width * (i + 1) / 4, y + height / 4);
+                    context.lineTo(x + width * (i + 1.3) / 4, y + height / 3);
                     context.strokeStyle = "red";
                     context.lineWidth = 2;
                     context.stroke();
@@ -402,7 +402,7 @@ let powerUpAITypes = {
         color: "cyan",
         duration: 0, // Vĩnh viễn
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -412,9 +412,9 @@ let powerUpAITypes = {
                 context.fillRect(x, y, width, height);
                 context.fillStyle = "red";
                 context.font = "20px courier";
-                context.fillText("+1", x + width/4, y + height*2/3);
+                context.fillText("+1", x + width / 4, y + height * 2 / 3);
                 context.fillStyle = "red";
-                context.fillRect(x + width/4, y + height/4, width/2, height/3);
+                context.fillRect(x + width / 4, y + height / 4, width / 2, height / 3);
             }
         }
     },
@@ -422,7 +422,7 @@ let powerUpAITypes = {
         color: "lightblue",
         duration: 15000,
         img: null,
-        draw: function(context, x, y, width, height) {
+        draw: function (context, x, y, width, height) {
             if (this.img) {
                 // Vẽ với kích thước cố định bằng tileSize
                 context.drawImage(this.img, x, y, tileSize, tileSize);
@@ -431,13 +431,13 @@ let powerUpAITypes = {
                 context.fillStyle = this.color;
                 context.fillRect(x, y, width, height);
                 context.beginPath();
-                context.arc(x + width/2, y + height/2, width/3, 0, Math.PI * 2);
+                context.arc(x + width / 2, y + height / 2, width / 3, 0, Math.PI * 2);
                 context.strokeStyle = "red";
                 context.lineWidth = 2;
                 context.stroke();
                 context.beginPath();
-                context.moveTo(x + width/2, y + height/2);
-                context.lineTo(x + width/2, y + height/3);
+                context.moveTo(x + width / 2, y + height / 2);
+                context.lineTo(x + width / 2, y + height / 3);
                 context.strokeStyle = "red";
                 context.stroke();
             }
@@ -447,7 +447,7 @@ let powerUpAITypes = {
 
 // AI ship
 let aiShip = {
-    x: shipX + boardWidth/3,
+    x: shipX + boardWidth / 3,
     y: shipY,
     width: shipWidth,
     height: shipHeight,
@@ -499,7 +499,7 @@ let versusResult = null; // Giá trị: "win", "lose", hoặc null
 // Thêm biến để theo dõi cách kết thúc game trong chế độ single player
 let singlePlayerResult = null; // Giá trị: "win", "lose", hoặc null
 
-// Thêm hàm hiển thị hộp thoại nhập tên người chơi
+// Sửa hàm showPlayerNameDialog để gọi đến showGameModeSelection từ file gamemode.js
 function showPlayerNameDialog() {
     // Tạo lớp phủ nền
     let modalBackdrop = document.createElement("div");
@@ -564,7 +564,7 @@ function showPlayerNameDialog() {
     startButton.style.fontFamily = "courier";
     startButton.style.fontWeight = "bold";
     dialog.appendChild(startButton);
-    
+
     // Nút xem điểm cao thay vì hiển thị điểm cao trực tiếp
     let highScoresButton = document.createElement("button");
     highScoresButton.textContent = "ĐIỂM CAO NHẤT";
@@ -578,7 +578,7 @@ function showPlayerNameDialog() {
     highScoresButton.style.fontFamily = "courier";
     highScoresButton.style.fontWeight = "bold";
     dialog.appendChild(highScoresButton);
-    
+
     // Thêm nút hướng dẫn
     let instructionsButton = document.createElement("button");
     instructionsButton.textContent = "HƯỚNG DẪN";
@@ -595,26 +595,29 @@ function showPlayerNameDialog() {
 
     // Thêm sự kiện
     nameInput.focus();
-    startButton.onclick = function() {
+    startButton.onclick = function () {
         if (nameInput.value.trim() !== "") {
             playerName = nameInput.value.trim();
         }
         document.body.removeChild(modalBackdrop);
-        resetGame();
+
+        // Thay vì resetGame() ngay, chuyển sang màn hình chọn chế độ chơi
+        // Gọi hàm từ gamemode.js
+        showGameModeSelection();
     };
 
-    highScoresButton.onclick = function() {
+    highScoresButton.onclick = function () {
         document.body.removeChild(modalBackdrop);
         showHighScoresScreen();
     };
-    
+
     // Thêm sự kiện cho nút hướng dẫn
-    instructionsButton.onclick = function() {
+    instructionsButton.onclick = function () {
         document.body.removeChild(modalBackdrop);
         showInstructionsScreen();
     };
 
-    nameInput.addEventListener("keydown", function(e) {
+    nameInput.addEventListener("keydown", function (e) {
         if (e.key === "Enter") {
             startButton.click();
         }
@@ -625,7 +628,124 @@ function showPlayerNameDialog() {
     document.body.appendChild(modalBackdrop);
 }
 
-// Thêm hàm hiển thị màn hình hướng dẫn
+// Khởi tạo highScores
+let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+
+function createStars() {
+    for (let i = 0; i < 200; i++) {
+        stars.push({
+            x: Math.random() * boardWidth,
+            y: Math.random() * boardHeight,
+            size: Math.random() * 3,
+            speed: 1 + Math.random() * 2
+        });
+    }
+}
+
+function drawBackground() {
+    // Vẽ nền đen
+    context.fillStyle = "black";
+    context.fillRect(0, 0, boardWidth, boardHeight);
+
+    // Vẽ các ngôi sao
+    stars.forEach(star => {
+        context.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
+        context.beginPath();
+        context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        context.fill();
+
+        // Di chuyển sao xuống dưới
+        star.y += star.speed;
+
+        // Nếu sao đi ra khỏi màn hình phía dưới, đặt lại vị trí ở trên
+        if (star.y > boardHeight) {
+            star.y = 0;
+            star.x = Math.random() * boardWidth;
+        }
+    });
+}
+
+// Boss và laze
+let boss = null;
+let bossWidth = tileSize * 4;
+let bossHeight = tileSize * 4;
+let bossHealth = 50;
+let bossMaxHealth = 50;
+let bossVelocityX = 2;
+let bossLasers = [];
+let bossLaserWidth = tileSize * 2;
+let bossLaserTimer = 0;
+let bossLaserInterval = 300; // 5 seconds (60 frames per second * 5)
+let bossLaserCount = 2; // Bắt đầu với 2 đường laser
+let isBossFight = false;
+let bossDefeated = false;
+
+// Thêm hàm loadInstructionImages trước hàm window.onload
+// Thêm hình ảnh cho phần hướng dẫn
+function loadInstructionImages() {
+    try {
+        // Tải hình ảnh cho tàu
+        const shipInstrImg = new Image();
+        shipInstrImg.src = "./ship.png";
+        window.shipInstructionImg = shipInstrImg;
+
+        // Tải hình ảnh cho alien
+        const alienInstrImg = new Image();
+        alienInstrImg.src = "./alien.png";
+        window.alienInstructionImg = alienInstrImg;
+
+        // Tải hình ảnh cho boss
+        const bossInstrImg = new Image();
+        bossInstrImg.src = "./boss.png";
+        window.bossInstructionImg = bossInstrImg;
+
+        // Tải hình ảnh buff cho phần hướng dẫn
+        const buffTypes = [
+            'shield',
+            'rapidFire',
+            'piercingShot',
+            'multiShot',
+            'bomb',
+            'permanentBulletUp',
+            'slowAliens'
+        ];
+
+        window.instructionBuffImages = {};
+
+        buffTypes.forEach(type => {
+            const img = new Image();
+            img.src = `./buffship/${type}.png`;
+
+            img.onload = function () {
+                console.log(`Loaded instruction buff image: ${type}`);
+                window.instructionBuffImages[type] = img;
+            };
+
+            img.onerror = function () {
+                console.error(`Failed to load instruction buff image: ${type}`);
+
+                // Thử lại với tên file viết thường
+                const retryImg = new Image();
+                retryImg.src = `./buffship/${type.toLowerCase()}.png`;
+
+                retryImg.onload = function () {
+                    console.log(`Loaded instruction buff image (lowercase): ${type}`);
+                    window.instructionBuffImages[type] = retryImg;
+                };
+
+                retryImg.onerror = function () {
+                    console.error(`Failed to load instruction buff image with all attempts: ${type}`);
+                };
+            };
+        });
+
+        console.log("Loaded instruction images");
+    } catch (error) {
+        console.error("Error loading instruction images:", error);
+    }
+}
+
+// Thêm hàm showInstructionsScreen vì hàm này cũng được gọi trong showPlayerNameDialog nhưng chưa được định nghĩa
 function showInstructionsScreen() {
     // Tạo lớp phủ nền
     let modalBackdrop = document.createElement("div");
@@ -665,7 +785,7 @@ function showInstructionsScreen() {
     let content = document.createElement("div");
     content.style.textAlign = "left";
     content.style.marginBottom = "20px";
-    
+
     // Phần điều khiển
     let controlsTitle = document.createElement("h3");
     controlsTitle.textContent = "ĐIỀU KHIỂN";
@@ -673,11 +793,11 @@ function showInstructionsScreen() {
     controlsTitle.style.borderBottom = "1px solid #f0c808";
     controlsTitle.style.paddingBottom = "5px";
     content.appendChild(controlsTitle);
-    
+
     let controlsList = document.createElement("ul");
     controlsList.style.listStyleType = "none";
     controlsList.style.padding = "0 10px";
-    
+
     let controls = [
         "Mũi tên TRÁI: Di chuyển tàu sang trái",
         "Mũi tên PHẢI: Di chuyển tàu sang phải",
@@ -685,16 +805,16 @@ function showInstructionsScreen() {
         "R: Khởi động lại khi game over",
         "ENTER: Khởi động lại khi game over hoặc thắng"
     ];
-    
+
     controls.forEach(control => {
         let item = document.createElement("li");
         item.textContent = control;
         item.style.margin = "10px 0";
         controlsList.appendChild(item);
     });
-    
+
     content.appendChild(controlsList);
-    
+
     // Phần chế độ chơi
     let modesTitle = document.createElement("h3");
     modesTitle.textContent = "CHẾ ĐỘ CHƠI";
@@ -703,25 +823,25 @@ function showInstructionsScreen() {
     modesTitle.style.paddingBottom = "5px";
     modesTitle.style.marginTop = "20px";
     content.appendChild(modesTitle);
-    
+
     let modesList = document.createElement("ul");
     modesList.style.listStyleType = "none";
     modesList.style.padding = "0 10px";
-    
+
     let modes = [
         "Single Player: Chơi đơn, tiêu diệt alien và boss",
         "Versus AI: Chơi cùng AI, cạnh tranh điểm số"
     ];
-    
+
     modes.forEach(mode => {
         let item = document.createElement("li");
         item.textContent = mode;
         item.style.margin = "10px 0";
         modesList.appendChild(item);
     });
-    
+
     content.appendChild(modesList);
-    
+
     // Phần power-ups
     let powerUpsTitle = document.createElement("h3");
     powerUpsTitle.textContent = "POWER-UPS";
@@ -730,13 +850,13 @@ function showInstructionsScreen() {
     powerUpsTitle.style.paddingBottom = "5px";
     powerUpsTitle.style.marginTop = "20px";
     content.appendChild(powerUpsTitle);
-    
+
     // Tạo bảng power-ups với hình ảnh
     let powerUpsTable = document.createElement("table");
     powerUpsTable.style.width = "100%";
     powerUpsTable.style.borderCollapse = "collapse";
     powerUpsTable.style.marginTop = "10px";
-    
+
     // Tạo header cho bảng - bỏ cột màu sắc
     let tableHeader = document.createElement("tr");
     ["HÌNH ẢNH", "TÊN", "HIỆU ỨNG"].forEach(headerText => {
@@ -748,46 +868,46 @@ function showInstructionsScreen() {
         tableHeader.appendChild(header);
     });
     powerUpsTable.appendChild(tableHeader);
-    
+
     // Danh sách power-ups với hình ảnh và hiệu ứng chi tiết
     let powerUpsList = [
-        { 
-            name: "Shield", 
+        {
+            name: "Shield",
             effect: "Tạo lá chắn bảo vệ tàu khỏi đạn trong 8 giây",
             imgSrc: "./buffship/shield.png"
         },
-        { 
-            name: "Rapid Fire", 
+        {
+            name: "Rapid Fire",
             effect: "Tăng gấp đôi tốc độ đạn trong 10 giây",
             imgSrc: "./buffship/rapidFire.png"
         },
-        { 
-            name: "Piercing Shot", 
+        {
+            name: "Piercing Shot",
             effect: "Đạn xuyên qua nhiều alien trong 12 giây",
             imgSrc: "./buffship/piercingShot.png"
         },
-        { 
-            name: "Multi Shot", 
+        {
+            name: "Multi Shot",
             effect: "Bắn cùng lúc 3 hướng khác nhau trong 8 giây",
             imgSrc: "./buffship/multiShot.png"
         },
-        { 
-            name: "Bomb", 
+        {
+            name: "Bomb",
             effect: "Phá hủy tất cả alien có trên màn hình ngay lập tức",
             imgSrc: "./buffship/bomb.png"
         },
-        { 
-            name: "Bullet Up", 
+        {
+            name: "Bullet Up",
             effect: "Tăng vĩnh viễn số lượng đạn bắn ra mỗi lần",
             imgSrc: "./buffship/permanentBulletUp.png"
         },
-        { 
-            name: "Slow Aliens", 
+        {
+            name: "Slow Aliens",
             effect: "Làm chậm di chuyển của alien trong 15 giây",
             imgSrc: "./buffship/slowAliens.png"
         }
     ];
-    
+
     powerUpsList.forEach((powerUp, index) => {
         let row = document.createElement("tr");
         row.style.backgroundColor = index % 2 === 0 ? "rgba(50, 50, 50, 0.5)" : "rgba(30, 30, 30, 0.5)";
@@ -796,7 +916,7 @@ function showInstructionsScreen() {
         imgCell.style.padding = "8px";
         imgCell.style.borderBottom = "1px solid #333";
         imgCell.style.width = "64px";
-        
+
         // Tạo hình ảnh
         let img = document.createElement("img");
         img.src = powerUp.imgSrc;
@@ -805,20 +925,20 @@ function showInstructionsScreen() {
         img.style.height = "32px";
         img.style.display = "block";
         img.style.margin = "0 auto";
-        
+
         // Xử lý lỗi khi tải hình ảnh
-        img.onerror = function() {
+        img.onerror = function () {
             this.onerror = null;
             this.src = powerUp.imgSrc.toLowerCase(); // Thử lại với tên file viết thường
-            
+
             // Nếu vẫn lỗi, hiển thị placeholder
-            this.onerror = function() {
+            this.onerror = function () {
                 let placeholder = document.createElement("div");
                 placeholder.style.width = "32px";
                 placeholder.style.height = "32px";
-                
+
                 // Sử dụng các màu tương ứng với từng loại buff cho placeholder
-                switch(powerUp.name) {
+                switch (powerUp.name) {
                     case "Shield": placeholder.style.backgroundColor = "blue"; break;
                     case "Rapid Fire": placeholder.style.backgroundColor = "red"; break;
                     case "Piercing Shot": placeholder.style.backgroundColor = "purple"; break;
@@ -828,39 +948,39 @@ function showInstructionsScreen() {
                     case "Slow Aliens": placeholder.style.backgroundColor = "lightblue"; break;
                     default: placeholder.style.backgroundColor = "gray";
                 }
-                
+
                 placeholder.style.margin = "0 auto";
                 placeholder.style.borderRadius = "4px";
                 placeholder.style.border = "1px solid white";
-                
+
                 imgCell.innerHTML = "";
                 imgCell.appendChild(placeholder);
             };
         };
-        
+
         imgCell.appendChild(img);
         row.appendChild(imgCell);
-        
+
         // Cells cho tên và hiệu ứng (bỏ cột màu sắc)
         ["name", "effect"].forEach(prop => {
             let cell = document.createElement("td");
             cell.textContent = powerUp[prop];
             cell.style.padding = "8px";
             cell.style.borderBottom = "1px solid #333";
-            
+
             // Điều chỉnh style cho cột hiệu ứng
             if (prop === "effect") {
                 cell.style.width = "70%"; // Tăng độ rộng cho cột hiệu ứng
             }
-            
+
             row.appendChild(cell);
         });
-        
+
         powerUpsTable.appendChild(row);
     });
-    
+
     content.appendChild(powerUpsTable);
-    
+
     // Thêm lưu ý về power-up
     let powerUpNote = document.createElement("p");
     powerUpNote.innerHTML = "<strong>Lưu ý:</strong> Các power-up sẽ rơi xuống khi bạn tiêu diệt alien. Hãy di chuyển tàu để bắt chúng!";
@@ -869,7 +989,7 @@ function showInstructionsScreen() {
     powerUpNote.style.fontStyle = "italic";
     powerUpNote.style.color = "#f0c808";
     content.appendChild(powerUpNote);
-    
+
     // Phần boss fight
     let bossTitle = document.createElement("h3");
     bossTitle.textContent = "BOSS FIGHT";
@@ -878,13 +998,13 @@ function showInstructionsScreen() {
     bossTitle.style.paddingBottom = "5px";
     bossTitle.style.marginTop = "20px";
     content.appendChild(bossTitle);
-    
+
     let bossInfo = document.createElement("p");
     bossInfo.innerHTML = "Khi tiêu diệt đủ số lượng alien, bạn sẽ phải đối mặt với BOSS.<br>BOSS sẽ bắn các tia laser rất mạnh. Hãy né tránh chúng và bắn vào BOSS để giành chiến thắng!";
     bossInfo.style.lineHeight = "1.5";
     bossInfo.style.padding = "0 10px";
     content.appendChild(bossInfo);
-    
+
     // Phần mẹo
     let tipsTitle = document.createElement("h3");
     tipsTitle.textContent = "MẸO CHƠI";
@@ -893,27 +1013,27 @@ function showInstructionsScreen() {
     tipsTitle.style.paddingBottom = "5px";
     tipsTitle.style.marginTop = "20px";
     content.appendChild(tipsTitle);
-    
+
     let tipsList = document.createElement("ul");
     tipsList.style.listStyleType = "none";
     tipsList.style.padding = "0 10px";
-    
+
     let tips = [
         "Ưu tiên tiêu diệt alien loại bắn đạn (màu hồng) trước",
         "Thu thập power-up Bullet Up để tăng sức mạnh vĩnh viễn",
         "Shield rất có giá trị khi đối đầu với boss",
         "Trong chế độ versus, hãy cạnh tranh điểm số với AI"
     ];
-    
+
     tips.forEach(tip => {
         let item = document.createElement("li");
         item.textContent = "👉 " + tip;
         item.style.margin = "10px 0";
         tipsList.appendChild(item);
     });
-    
+
     content.appendChild(tipsList);
-    
+
     dialog.appendChild(content);
 
     // Nút Quay Lại
@@ -931,7 +1051,7 @@ function showInstructionsScreen() {
     dialog.appendChild(backButton);
 
     // Thêm sự kiện
-    backButton.onclick = function() {
+    backButton.onclick = function () {
         document.body.removeChild(modalBackdrop);
         showPlayerNameDialog();
     };
@@ -941,134 +1061,67 @@ function showInstructionsScreen() {
     document.body.appendChild(modalBackdrop);
 }
 
-// Thêm hình ảnh cho phần hướng dẫn
-function loadInstructionImages() {
-    try {
-        // Tải hình ảnh cho tàu
-        const shipInstrImg = new Image();
-        shipInstrImg.src = "./ship.png";
-        window.shipInstructionImg = shipInstrImg;
-        
-        // Tải hình ảnh cho alien
-        const alienInstrImg = new Image();
-        alienInstrImg.src = "./alien.png";
-        window.alienInstructionImg = alienInstrImg;
-        
-        // Tải hình ảnh cho boss
-        const bossInstrImg = new Image();
-        bossInstrImg.src = "./boss.png";
-        window.bossInstructionImg = bossInstrImg;
-        
-        // Tải hình ảnh buff cho phần hướng dẫn
-        const buffTypes = [
-            'shield',
-            'rapidFire',
-            'piercingShot',
-            'multiShot',
-            'bomb',
-            'permanentBulletUp',
-            'slowAliens'
-        ];
-        
-        window.instructionBuffImages = {};
-        
-        buffTypes.forEach(type => {
-            const img = new Image();
-            img.src = `./buffship/${type}.png`;
-            
-            img.onload = function() {
-                console.log(`Loaded instruction buff image: ${type}`);
-                window.instructionBuffImages[type] = img;
-            };
-            
-            img.onerror = function() {
-                console.error(`Failed to load instruction buff image: ${type}`);
-                
-                // Thử lại với tên file viết thường
-                const retryImg = new Image();
-                retryImg.src = `./buffship/${type.toLowerCase()}.png`;
-                
-                retryImg.onload = function() {
-                    console.log(`Loaded instruction buff image (lowercase): ${type}`);
-                    window.instructionBuffImages[type] = retryImg;
-                };
-                
-                retryImg.onerror = function() {
-                    console.error(`Failed to load instruction buff image with all attempts: ${type}`);
-                };
-            };
-        });
-        
-        console.log("Loaded instruction images");
-    } catch (error) {
-        console.error("Error loading instruction images:", error);
+// Thêm hàm flashWarning cho boss lasers
+function flashWarning() {
+    // Hiệu ứng nhấp nháy cảnh báo khi boss sắp bắn laser
+    let warningFlash = document.createElement("div");
+    warningFlash.style.position = "fixed";
+    warningFlash.style.top = "0";
+    warningFlash.style.left = "0";
+    warningFlash.style.width = "100%";
+    warningFlash.style.height = "100%";
+    warningFlash.style.backgroundColor = "rgba(255, 0, 0, 0.3)";
+    warningFlash.style.zIndex = "1000";
+    warningFlash.style.pointerEvents = "none"; // Cho phép click qua flash
+    document.body.appendChild(warningFlash);
+
+    // Hiển thị text cảnh báo
+    let warningText = document.createElement("div");
+    warningText.textContent = "CẢNH BÁO! LASER SẮP BẮN!";
+    warningText.style.position = "fixed";
+    warningText.style.top = "50%";
+    warningText.style.left = "50%";
+    warningText.style.transform = "translate(-50%, -50%)";
+    warningText.style.color = "red";
+    warningText.style.fontFamily = "courier";
+    warningText.style.fontSize = "30px";
+    warningText.style.fontWeight = "bold";
+    warningText.style.textAlign = "center";
+    warningText.style.textShadow = "0 0 10px rgba(255, 255, 255, 0.8)";
+    warningFlash.appendChild(warningText);
+
+    // Nhấp nháy và xóa sau một khoảng thời gian
+    let opacity = 1;
+    let fadeInterval = setInterval(() => {
+        opacity = opacity === 1 ? 0.5 : 1;
+        warningFlash.style.opacity = opacity;
+    }, 200);
+
+    setTimeout(() => {
+        clearInterval(fadeInterval);
+        document.body.removeChild(warningFlash);
+    }, 2000);
+
+    // Thêm debug info vào console
+    if (aiEnabled) {
+        console.log("AI status check - active:", aiShip.active,
+            "difficulty:", aiShip.difficulty,
+            "position:", aiShip.x, aiShip.y);
     }
 }
 
-// Khởi tạo highScores
-let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
-
-function createStars() {
-    for(let i = 0; i < 200; i++) {
-        stars.push({
-            x: Math.random() * boardWidth,
-            y: Math.random() * boardHeight,
-            size: Math.random() * 3,
-            speed: 1 + Math.random() * 2
-        });
-    }
-}
-
-function drawBackground() {
-    // Vẽ nền đen
-    context.fillStyle = "black";
-    context.fillRect(0, 0, boardWidth, boardHeight);
-
-    // Vẽ các ngôi sao
-    stars.forEach(star => {
-        context.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
-        context.beginPath();
-        context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-        context.fill();
-
-        // Di chuyển sao xuống dưới
-        star.y += star.speed;
-
-        // Nếu sao đi ra khỏi màn hình phía dưới, đặt lại vị trí ở trên
-        if(star.y > boardHeight) {
-            star.y = 0;
-            star.x = Math.random() * boardWidth;
-        }
-    });
-}
-
-// Boss và laze
-let boss = null;
-let bossWidth = tileSize * 4;
-let bossHeight = tileSize * 4;
-let bossHealth = 50;
-let bossMaxHealth = 50;
-let bossVelocityX = 2;
-let bossLasers = [];
-let bossLaserWidth = tileSize * 2;
-let bossLaserTimer = 0;
-let bossLaserInterval = 300; // 5 seconds (60 frames per second * 5)
-let bossLaserCount = 2; // Bắt đầu với 2 đường laser
-let isBossFight = false;
-let bossDefeated = false;
-
-window.onload = function() {
+window.onload = function () {
     try {
         board = document.getElementById("board");
         if (!board) {
             console.error("Canvas element 'board' not found!");
             return;
         }
-        
+
         board.width = boardWidth;
         board.height = boardHeight;
         context = board.getContext("2d");
-        
+
         if (!context) {
             console.error("Could not get 2D context from canvas!");
             return;
@@ -1078,24 +1131,24 @@ window.onload = function() {
         for (let type in alienTypes) {
             let img = new Image();
             img.src = alienTypes[type].img;
-            img.onload = function() {
+            img.onload = function () {
                 console.log(`Loaded alien image: ${type}`);
                 alienTypes[type].imgObject = img;
             };
-            img.onerror = function() {
+            img.onerror = function () {
                 console.error(`Failed to load alien image: ${type} from ${alienTypes[type].img}`);
             };
         }
 
         shipImg = new Image();
         shipImg.src = "./ship.png";
-        shipImg.onload = function() {
+        shipImg.onload = function () {
             context.drawImage(shipImg, ship.x, ship.y, ship.width, ship.height);
         }
 
         aiShipImg = new Image();
         aiShipImg.src = "./shipAI.png"; // Cập nhật đường dẫn ảnh cho tàu AI
-        aiShipImg.onerror = function() {
+        aiShipImg.onerror = function () {
             aiShipImg.src = "./ship.png"; // Fallback nếu không có hình ảnh riêng
         };
 
@@ -1106,18 +1159,18 @@ window.onload = function() {
         createStars();
         createAliens();
         setupGameMenu();
-        
+
         // Tải điểm cao từ localStorage một cách an toàn
         try {
             const savedScores = localStorage.getItem("highScores");
             if (savedScores) {
                 highScores = JSON.parse(savedScores);
-                
+
                 // Kiểm tra xem highScores có phải là một mảng hay không
                 if (!Array.isArray(highScores)) {
                     highScores = [];
                 }
-                
+
                 // Chuyển đổi định dạng cũ (chỉ số điểm) sang định dạng mới (đối tượng với tên và điểm)
                 highScores = highScores.map(item => {
                     if (typeof item === "number") {
@@ -1128,15 +1181,15 @@ window.onload = function() {
                         return { name: "Không tên", score: 0 };
                     }
                 });
-                
+
                 // Lọc ra các bản ghi không hợp lệ
-                highScores = highScores.filter(item => 
+                highScores = highScores.filter(item =>
                     item && typeof item === "object" && typeof item.score === "number"
                 );
-                
+
                 // Sắp xếp lại theo điểm số giảm dần
                 highScores.sort((a, b) => b.score - a.score);
-                
+
                 console.log("Đã tải điểm cao:", highScores);
             } else {
                 highScores = [];
@@ -1145,23 +1198,23 @@ window.onload = function() {
             console.error("Lỗi khi tải điểm cao:", e);
             highScores = [];
         }
-        
+
         // Tải tất cả hình ảnh cho buff
         loadAllBuffImages();
-        
+
         // Tải hình ảnh cho hướng dẫn
         loadInstructionImages();
-        
+
         // Hiển thị hộp thoại nhập tên
         showPlayerNameDialog();
-        
+
         console.log("Game initialized successfully");
-        
+
         // Vòng lặp game sẽ bắt đầu sau khi người chơi nhập tên
         requestAnimationFrame(update);
         document.addEventListener("keydown", moveShip);
         document.addEventListener("keydown", shoot);
-        
+
         // Khởi tạo biến boss fight
         boss = null;
         bossHealth = bossMaxHealth;
@@ -1178,7 +1231,7 @@ window.onload = function() {
 
 
 // Thêm event listener cho phím Enter để bắt đầu lại game giống với nút "Bắt đầu lại"
-window.addEventListener("keydown", function(e) {
+window.addEventListener("keydown", function (e) {
     if (e.key === "Enter" && (gameOver || bossDefeated || versusResult)) {
         // Hiển thị hộp thoại xác nhận
         if (confirm("Bạn có chắc muốn bắt đầu lại trò chơi? Điểm hiện tại sẽ bị mất.")) {
@@ -1193,7 +1246,7 @@ function setupGameMenu() {
     if (existingMenu) {
         existingMenu.remove();
     }
-    
+
     // Tạo menu chọn chế độ chơi và độ khó
     let menuDiv = document.createElement("div");
     menuDiv.id = "game-menu";
@@ -1206,58 +1259,58 @@ function setupGameMenu() {
     menuDiv.style.color = "white";
     menuDiv.style.fontFamily = "courier";
     menuDiv.style.zIndex = "1000";
-    
+
     // Chọn chế độ chơi
     let modeLabel = document.createElement("div");
     modeLabel.textContent = "Game Mode:";
     menuDiv.appendChild(modeLabel);
-    
+
     let modeSelect = document.createElement("select");
     modeSelect.id = "game-mode";
     modeSelect.style.margin = "5px 0";
     modeSelect.style.padding = "3px";
     modeSelect.style.width = "100%";
-    
+
     let singleOption = document.createElement("option");
     singleOption.value = "single";
     singleOption.textContent = "Single Player";
     modeSelect.appendChild(singleOption);
-    
+
     let versusOption = document.createElement("option");
     versusOption.value = "versus";
     versusOption.textContent = "Versus AI";
     modeSelect.appendChild(versusOption);
-    
+
     menuDiv.appendChild(modeSelect);
-    
+
     // Chọn độ khó
     let diffLabel = document.createElement("div");
     diffLabel.textContent = "AI Difficulty:";
     menuDiv.appendChild(diffLabel);
-    
+
     let diffSelect = document.createElement("select");
     diffSelect.id = "ai-difficulty";
     diffSelect.style.margin = "5px 0";
     diffSelect.style.padding = "3px";
     diffSelect.style.width = "100%";
-    
+
     let easyOption = document.createElement("option");
     easyOption.value = "easy";
     easyOption.textContent = "Easy";
     diffSelect.appendChild(easyOption);
-    
+
     let mediumOption = document.createElement("option");
     mediumOption.value = "medium";
     mediumOption.textContent = "Medium";
     diffSelect.appendChild(mediumOption);
-    
+
     let hardOption = document.createElement("option");
     hardOption.value = "hard";
     hardOption.textContent = "Hard";
     diffSelect.appendChild(hardOption);
-    
+
     menuDiv.appendChild(diffSelect);
-    
+
     // Nút áp dụng
     let applyButton = document.createElement("button");
     applyButton.textContent = "Apply";
@@ -1265,14 +1318,14 @@ function setupGameMenu() {
     applyButton.style.padding = "5px 10px";
     applyButton.style.width = "100%";
     applyButton.style.cursor = "pointer";
-    applyButton.addEventListener("click", function() {
+    applyButton.addEventListener("click", function () {
         gameMode = modeSelect.value;
         aiShip.difficulty = diffSelect.value;
         aiEnabled = (gameMode === "versus");
-        
+
         // Reset game khi thay đổi chế độ
         resetGame();
-        
+
         if (aiEnabled) {
             aiShip.active = true;
             console.log("AI enabled with difficulty: " + aiShip.difficulty);
@@ -1282,7 +1335,7 @@ function setupGameMenu() {
         }
     });
     menuDiv.appendChild(applyButton);
-    
+
     // Thêm nút bắt đầu lại mới luôn hiển thị trong menu
     let restartGameButton = document.createElement("button");
     restartGameButton.textContent = "BẮT ĐẦU LẠI";
@@ -1295,24 +1348,24 @@ function setupGameMenu() {
     restartGameButton.style.borderRadius = "3px";
     restartGameButton.style.cursor = "pointer";
     restartGameButton.style.fontWeight = "bold";
-    
+
     // Thêm hiệu ứng hover
-    restartGameButton.onmouseover = function() {
+    restartGameButton.onmouseover = function () {
         restartGameButton.style.backgroundColor = "#cc3700";
     };
-    restartGameButton.onmouseout = function() {
+    restartGameButton.onmouseout = function () {
         restartGameButton.style.backgroundColor = "#ff4500";
     };
-    
+
     // Thêm sự kiện click
-    restartGameButton.addEventListener("click", function() {
+    restartGameButton.addEventListener("click", function () {
         // Hiển thị hộp thoại xác nhận
         if (confirm("Bạn có chắc muốn bắt đầu lại trò chơi? Điểm hiện tại sẽ bị mất.")) {
             showPlayerNameDialog();
         }
     });
     menuDiv.appendChild(restartGameButton);
-    
+
     // Thêm nút trợ giúp debug vào menu game
     if (window.location.search.includes('debug=true')) {
         let debugButton = document.createElement("button");
@@ -1324,16 +1377,16 @@ function setupGameMenu() {
         debugButton.style.color = "white";
         debugButton.style.border = "none";
         debugButton.style.cursor = "pointer";
-        
-        debugButton.onclick = function() {
+
+        debugButton.onclick = function () {
             console.log("Debug: Manual boss fight activation");
             alienColumns = 7; // Đủ để kích hoạt boss fight
             alienCount = 0; // Giả vờ rằng tất cả alien đã bị tiêu diệt
         };
-        
+
         menuDiv.appendChild(debugButton);
     }
-    
+
     document.body.appendChild(menuDiv);
 }
 
@@ -1344,78 +1397,78 @@ function update() {
     if (gameOver && !aiEnabled) {
         context.fillStyle = "black";
         context.fillRect(0, 0, boardWidth, boardHeight);
-        
+
         // Vẽ các ngôi sao làm nền
         stars.forEach(star => {
             context.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
             context.beginPath();
             context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
             context.fill();
-            
+
             // Di chuyển sao chậm hơn
             star.y += star.speed * 0.3;
-            if(star.y > boardHeight) {
+            if (star.y > boardHeight) {
                 star.y = 0;
                 star.x = Math.random() * boardWidth;
             }
         });
-        
+
         // Hiển thị thông báo game over
         context.fillStyle = "#ff0000"; // Màu đỏ cho thất bại
         context.font = "32px courier bold";
-        context.fillText("BẠN ĐÃ BỊ TIÊU DIỆT", boardWidth/2 - 180, boardHeight/2 - 80);
-        
+        context.fillText("BẠN ĐÃ BỊ TIÊU DIỆT", boardWidth / 2 - 180, boardHeight / 2 - 80);
+
         context.font = "16px courier";
         // Hiển thị điểm và tên người chơi
-        context.fillText(playerName + ": " + score + " điểm", boardWidth/2 - 100, boardHeight/2 - 40);
-        
+        context.fillText(playerName + ": " + score + " điểm", boardWidth / 2 - 100, boardHeight / 2 - 40);
+
         // Hiển thị top 5 điểm cao với kiểm tra hợp lệ
         context.fillStyle = "white";
-        context.fillText("High Scores:", boardWidth/2 - 100, boardHeight/2);
-        
+        context.fillText("High Scores:", boardWidth / 2 - 100, boardHeight / 2);
+
         if (Array.isArray(highScores)) {
             for (let i = 0; i < Math.min(5, highScores.length); i++) {
                 let displayText;
                 if (!highScores[i]) continue;
-                
+
                 if (typeof highScores[i] === "number") {
-                    displayText = (i+1) + ". Không tên: " + highScores[i];
+                    displayText = (i + 1) + ". Không tên: " + highScores[i];
                 } else if (typeof highScores[i] === "object" && highScores[i].name) {
-                    displayText = (i+1) + ". " + highScores[i].name + ": " + highScores[i].score;
+                    displayText = (i + 1) + ". " + highScores[i].name + ": " + highScores[i].score;
                 } else {
                     continue; // Bỏ qua các mục không hợp lệ
                 }
-                context.fillText(displayText, boardWidth/2 - 100, boardHeight/2 + 30 + i * 20);
+                context.fillText(displayText, boardWidth / 2 - 100, boardHeight / 2 + 30 + i * 20);
             }
         }
-        
+
         // Hiển thị thông báo về nút restart và phím Enter
         context.fillStyle = "yellow";
-        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth/2 - 230, boardHeight/2 + 140);
-        
+        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth / 2 - 230, boardHeight / 2 + 140);
+
         return;
     }
-    
+
     // Xử lý màn hình kết quả versus khi có kết quả
     if (aiEnabled && (versusResult || gameOver)) {
         context.fillStyle = "black";
         context.fillRect(0, 0, boardWidth, boardHeight);
-        
+
         // Vẽ các ngôi sao làm nền
         stars.forEach(star => {
             context.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
             context.beginPath();
             context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
             context.fill();
-            
+
             // Di chuyển sao chậm hơn
             star.y += star.speed * 0.3;
-            if(star.y > boardHeight) {
+            if (star.y > boardHeight) {
                 star.y = 0;
                 star.x = Math.random() * boardWidth;
             }
         });
-        
+
         // Hiển thị tiêu đề thắng/thua
         let resultText, resultColor;
         if (versusResult === "win") {
@@ -1425,45 +1478,45 @@ function update() {
             resultText = "BẠN ĐÃ THUA";
             resultColor = "#ff0000"; // Màu đỏ cho thất bại
         }
-        
+
         context.fillStyle = resultColor;
         context.font = "48px courier bold";
         context.textAlign = "center";
-        context.fillText(resultText, boardWidth/2, boardHeight/2 - 80);
+        context.fillText(resultText, boardWidth / 2, boardHeight / 2 - 80);
         context.textAlign = "start"; // Reset text align
-        
+
         // Hiển thị điểm số của người chơi và AI
         context.fillStyle = "white";
         context.font = "20px courier";
         context.textAlign = "center";
-        context.fillText(`${playerName}: ${score} điểm`, boardWidth/2, boardHeight/2);
-        context.fillText(`AI: ${aiShip.score} điểm`, boardWidth/2, boardHeight/2 + 30);
+        context.fillText(`${playerName}: ${score} điểm`, boardWidth / 2, boardHeight / 2);
+        context.fillText(`AI: ${aiShip.score} điểm`, boardWidth / 2, boardHeight / 2 + 30);
         context.textAlign = "start"; // Reset text align
-        
+
         // Hiển thị chênh lệch điểm số
         let scoreDiff = Math.abs(score - aiShip.score);
-        let leadingText = score > aiShip.score ? 
-                           `Bạn dẫn trước ${scoreDiff} điểm` : 
-                           `AI dẫn trước ${scoreDiff} điểm`;
-        
+        let leadingText = score > aiShip.score ?
+            `Bạn dẫn trước ${scoreDiff} điểm` :
+            `AI dẫn trước ${scoreDiff} điểm`;
+
         if (score === aiShip.score) leadingText = "Hòa điểm";
-        
+
         context.fillStyle = "#f0c808"; // Màu vàng
         context.font = "16px courier";
         context.textAlign = "center";
-        context.fillText(leadingText, boardWidth/2, boardHeight/2 + 60);
+        context.fillText(leadingText, boardWidth / 2, boardHeight / 2 + 60);
         context.textAlign = "start"; // Reset text align
-        
+
         // Hiển thị thông báo về nút restart và phím Enter
         context.fillStyle = "yellow";
         context.font = "16px courier";
         context.textAlign = "center";
-        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth/2, boardHeight/2 + 100);
+        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth / 2, boardHeight / 2 + 100);
         context.textAlign = "start"; // Reset text align
-        
+
         // Cập nhật điểm cao nếu chưa cập nhật
         updateHighScores();
-        
+
         return;
     }
 
@@ -1471,47 +1524,47 @@ function update() {
     if (bossDefeated && !aiEnabled) {
         context.fillStyle = "black";
         context.fillRect(0, 0, boardWidth, boardHeight);
-        
+
         // Vẽ các ngôi sao làm nền
         stars.forEach(star => {
             context.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
             context.beginPath();
             context.arc(star.x, star.y, star.size, 0, Math.PI * 2);
             context.fill();
-            
+
             // Di chuyển sao chậm hơn
             star.y += star.speed * 0.3;
-            if(star.y > boardHeight) {
+            if (star.y > boardHeight) {
                 star.y = 0;
                 star.x = Math.random() * boardWidth;
             }
         });
-        
+
         // Thay "VICTORY!" bằng "BẠN ĐÃ THẮNG"
         context.fillStyle = "#00ff00"; // Màu xanh lá cho chiến thắng
         context.font = "48px courier bold";
         context.textAlign = "center";
-        context.fillText("BẠN ĐÃ THẮNG", boardWidth/2, boardHeight/2 - 50);
+        context.fillText("BẠN ĐÃ THẮNG", boardWidth / 2, boardHeight / 2 - 50);
         context.textAlign = "start"; // Reset text align
-        
+
         context.fillStyle = "white";
         context.font = "20px courier";
         context.textAlign = "center";
-        context.fillText("Điểm của bạn: " + score, boardWidth/2, boardHeight/2);
+        context.fillText("Điểm của bạn: " + score, boardWidth / 2, boardHeight / 2);
         context.textAlign = "start"; // Reset text align
-        
+
         // Hiển thị thông báo về nút restart và phím Enter
         context.fillStyle = "yellow";
         context.font = "16px courier";
         context.textAlign = "center";
-        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth/2, boardHeight/2 + 50);
+        context.fillText("Nhấn vào nút 'BẮT ĐẦU LẠI' hoặc phím Enter để chơi lại", boardWidth / 2, boardHeight / 2 + 50);
         context.textAlign = "start"; // Reset text align
-        
+
         return;
     }
 
     context.clearRect(0, 0, board.width, board.height);
-    
+
     // Vẽ background với hiệu ứng sao
     drawBackground();
 
@@ -1521,16 +1574,16 @@ function update() {
     // Vẽ tàu AI nếu đang ở chế độ versus
     if (aiEnabled && aiShip.active) {
         context.drawImage(aiShipImg, aiShip.x, aiShip.y, aiShip.width, aiShip.height);
-        
+
         // Vẽ shield cho AI nếu active
         if (aiShip.isShieldActive) {
             context.strokeStyle = "rgba(255, 0, 0, 0.5)";
             context.lineWidth = 2;
             context.beginPath();
-            context.arc(aiShip.x + aiShip.width/2, aiShip.y + aiShip.height/2, aiShip.width/1.5, 0, 2 * Math.PI);
+            context.arc(aiShip.x + aiShip.width / 2, aiShip.y + aiShip.height / 2, aiShip.width / 1.5, 0, 2 * Math.PI);
             context.stroke();
         }
-        
+
         // Cập nhật AI
         updateAI();
     }
@@ -1540,7 +1593,7 @@ function update() {
         context.strokeStyle = "rgba(0, 255, 255, 0.5)";
         context.lineWidth = 2;
         context.beginPath();
-        context.arc(ship.x + ship.width/2, ship.y + ship.height/2, ship.width/1.5, 0, 2 * Math.PI);
+        context.arc(ship.x + ship.width / 2, ship.y + ship.height / 2, ship.width / 1.5, 0, 2 * Math.PI);
         context.stroke();
     }
 
@@ -1548,7 +1601,7 @@ function update() {
     if (shield < 100) {
         shield = Math.min(100, shield + shieldRegenRate);
     }
-    
+
     // Hồi shield cho AI
     if (aiEnabled && aiShip.shield < 100) {
         aiShip.shield = Math.min(100, aiShip.shield + shieldRegenRate);
@@ -1575,10 +1628,10 @@ function update() {
             //alien bắn đạn
             if (alien.type.shootRate > 0 && Math.random() < alien.type.shootRate) {
                 alienBullets.push({
-                    x: alien.x + alien.width/2,
+                    x: alien.x + alien.width / 2,
                     y: alien.y + alien.height,
-                    width: tileSize/8,
-                    height: tileSize/2
+                    width: tileSize / 8,
+                    height: tileSize / 2
                 });
             }
 
@@ -1597,7 +1650,7 @@ function update() {
         if (boss.x <= 0 || boss.x + boss.width >= boardWidth) {
             bossVelocityX *= -1;
         }
-        
+
         // Vẽ boss
         try {
             if (boss.img && boss.img.complete) {
@@ -1609,7 +1662,7 @@ function update() {
                 context.fillStyle = "white";
                 context.font = "20px courier";
                 context.textAlign = "center";
-                context.fillText("BOSS", boss.x + boss.width/2, boss.y + boss.height/2);
+                context.fillText("BOSS", boss.x + boss.width / 2, boss.y + boss.height / 2);
                 context.textAlign = "start"; // Reset text align
             }
         } catch (e) {
@@ -1618,20 +1671,20 @@ function update() {
             context.fillStyle = "red";
             context.fillRect(boss.x, boss.y, boss.width, boss.height);
         }
-        
+
         // Tăng bộ đếm thời gian để bắn laser
         bossLaserTimer++;
         if (bossLaserTimer >= bossLaserInterval) {
             bossLaserTimer = 0;
             createBossLasers();
         }
-        
+
         // Cập nhật và vẽ các laser
         updateBossLasers();
-        
+
         // Vẽ thanh máu
         drawBossHealthBar();
-    } 
+    }
     // Xử lý alien bình thường
     else {
         // Tạo wave mới khi hết alien
@@ -1640,13 +1693,13 @@ function update() {
             if (aiEnabled && aiShip.active) {
                 aiShip.score += alienColumns * alienRows * 50;
             }
-            
+
             // Sửa điều kiện bắt đầu boss fight
             if (alienColumns >= 6 || level >= 5) { // Giảm số cột xuống 6 hoặc khi đạt cấp độ 5
                 console.log("Starting boss fight, alienColumns =", alienColumns, "level =", level);
                 startBossFight();
             } else {
-                alienColumns = Math.min(alienColumns + 1, columns/2 - 2);
+                alienColumns = Math.min(alienColumns + 1, columns / 2 - 2);
                 alienRows = Math.min(alienRows + 1, rows - 4);
                 alienVelocityX += alienVelocityX > 0 ? 0.5 : -0.5;
                 alienArray = [];
@@ -1677,7 +1730,7 @@ function update() {
                         alienCount--;
                         score += alien.type.points;
                         gainExperience(alien.type.points / 10);
-                        
+
                         //tạo hiệu ứng nổ
                         explosions.push({
                             x: alien.x,
@@ -1691,15 +1744,15 @@ function update() {
                     if (!bullet.piercing) bullet.used = true;
                 }
             }
-        } 
+        }
         // Kiểm tra va chạm với boss
         else if (boss && !bullet.used && detectCollision(bullet, boss)) {
             bossHealth -= 1; // Mỗi đạn gây 1 damage
             bullet.used = true;
-            
+
             // Thêm 1000 điểm khi bắn trúng boss
             score += 1000;
-            
+
             // Hiệu ứng nổ nhỏ khi đạn trúng boss
             explosions.push({
                 x: bullet.x,
@@ -1708,16 +1761,16 @@ function update() {
                 duration: explosionDuration / 2,
                 size: 0.5  // Kích thước nhỏ hơn
             });
-            
+
             // Kiểm tra nếu boss bị tiêu diệt
             if (bossHealth <= 0) {
                 // Boss bị đánh bại
                 createBossExplosion(); // Tạo hiệu ứng nổ lớn
-                
+
                 if (aiEnabled) {
                     // Trong chế độ versus, quyết định thắng thua dựa vào điểm số
                     versusResult = (score >= aiShip.score) ? "win" : "lose";
-                    
+
                     // Nếu điểm bằng nhau thì người chơi thắng
                     if (score === aiShip.score) {
                         versusResult = "win";
@@ -1728,13 +1781,13 @@ function update() {
                     bossDefeated = true;
                     singlePlayerResult = "win";
                 }
-                
+
                 boss = null;
                 updateHighScores();
             }
         }
     }
-    
+
     // Update và vẽ đạn của AI
     if (aiEnabled) {
         for (let i = 0; i < aiBulletArray.length; i++) {
@@ -1755,7 +1808,7 @@ function update() {
                             alien.alive = false;
                             alienCount--;
                             aiShip.score += alien.type.points;
-                            
+
                             // Tạo hiệu ứng nổ
                             explosions.push({
                                 x: alien.x,
@@ -1763,7 +1816,7 @@ function update() {
                                 frame: 0,
                                 duration: explosionDuration
                             });
-                            
+
                             // Rơi buff cho AI với xác suất 20%
                             if (Math.random() < 0.2 && !buffAIExists) {
                                 spawnBuff(alien.x, alien.y, true); // true = dành cho AI
@@ -1772,15 +1825,15 @@ function update() {
                         if (!bullet.piercing) bullet.used = true;
                     }
                 }
-            } 
+            }
             // Kiểm tra va chạm với boss
             else if (boss && !bullet.used && detectCollision(bullet, boss)) {
                 bossHealth -= 1; // Mỗi đạn gây 1 damage
                 bullet.used = true;
-                
+
                 // Thưởng điểm cho AI khi bắn trúng boss
                 aiShip.score += 1000;
-                
+
                 // Hiệu ứng nổ nhỏ khi đạn trúng boss
                 explosions.push({
                     x: bullet.x,
@@ -1789,16 +1842,16 @@ function update() {
                     duration: explosionDuration / 2,
                     size: 0.5  // Kích thước nhỏ hơn
                 });
-                
+
                 // Kiểm tra nếu boss bị tiêu diệt
                 if (bossHealth <= 0) {
                     // Boss bị đánh bại
                     createBossExplosion(); // Tạo hiệu ứng nổ lớn
-                    
+
                     if (aiEnabled) {
                         // Trong chế độ versus, quyết định thắng thua dựa vào điểm số
                         versusResult = (score >= aiShip.score) ? "win" : "lose";
-                        
+
                         // Nếu điểm bằng nhau thì người chơi thắng
                         if (score === aiShip.score) {
                             versusResult = "win";
@@ -1809,13 +1862,13 @@ function update() {
                         bossDefeated = true;
                         singlePlayerResult = "win";
                     }
-                    
+
                     boss = null;
                     updateHighScores();
                 }
             }
         }
-        
+
         // Xóa đạn AI đã sử dụng
         while (aiBulletArray.length > 0 && (aiBulletArray[0].used || aiBulletArray[0].y < 0)) {
             aiBulletArray.shift();
@@ -1857,7 +1910,7 @@ function update() {
                 }
             }
             alienBullets.splice(i, 1);
-        } 
+        }
         // Kiểm tra va chạm với tàu AI
         else if (aiEnabled && aiShip.active && detectCollision(bullet, aiShip)) {
             if (aiShip.isShieldActive) {
@@ -1869,7 +1922,7 @@ function update() {
                 aiShip.lives--;
                 if (aiShip.lives <= 0) {
                     aiShip.active = false;
-                    
+
                     // Nếu AI bị tiêu diệt
                     if (lives > 0) {
                         // Người chơi vẫn còn sống, người chơi thắng
@@ -1910,7 +1963,7 @@ function update() {
             buffExists = false;
         }
     }
-    
+
     // Vẽ và xử lý buff AI
     if (buffAI && aiEnabled) {
         buffAI.y += buffAIVelocityY;
@@ -1935,12 +1988,12 @@ function update() {
     context.fillText("Shield: " + Math.floor(shield) + "%", 5, 60);
     context.fillText("Level: " + level, 5, 80);
     context.fillText("Bullets: " + permanentBulletCount, 5, 110);
-    
+
     // Vẽ thanh kinh nghiệm
     context.fillStyle = "gray";
     context.fillRect(5, 130, 150, 10);
     context.fillStyle = "yellow";
-    context.fillRect(5, 130, (experiencePoints/experienceToNextLevel) * 150, 10);
+    context.fillRect(5, 130, (experiencePoints / experienceToNextLevel) * 150, 10);
 
     // Vẽ thông tin AI nếu đang ở chế độ versus
     if (aiEnabled) {
@@ -1949,7 +2002,7 @@ function update() {
         context.fillText("AI Lives: " + aiShip.lives, boardWidth - 150, 40);
         context.fillText("AI Shield: " + Math.floor(aiShip.shield) + "%", boardWidth - 150, 60);
         context.fillText("AI Difficulty: " + aiShip.difficulty, boardWidth - 150, 80);
-        
+
         // Hiển thị người dẫn trước
         let leadingText = "";
         if (score > aiShip.score) {
@@ -1962,7 +2015,7 @@ function update() {
             leadingText = "Scores tied!";
             context.fillStyle = "yellow";
         }
-        context.fillText(leadingText, boardWidth/2 - 80, 20);
+        context.fillText(leadingText, boardWidth / 2 - 80, 20);
     } else {
         // Loại bỏ việc hiển thị điểm cao trong gameplay
         // Không hiển thị gì thay vì điểm cao
@@ -2017,13 +2070,13 @@ function shoot(e) {
             let angles = [-0.3, 0, 0.3];
             angles.forEach(mainAngle => {
                 // Với mỗi hướng chính, bắn số đạn theo permanentBulletCount
-                for(let i = 0; i < permanentBulletCount; i++) {
-                    let spreadAngle = mainAngle + (i - (permanentBulletCount-1)/2) * 0.15;
+                for (let i = 0; i < permanentBulletCount; i++) {
+                    let spreadAngle = mainAngle + (i - (permanentBulletCount - 1) / 2) * 0.15;
                     let bullet = {
-                        x: ship.x + shipWidth * 15/32,
+                        x: ship.x + shipWidth * 15 / 32,
                         y: ship.y,
-                        width: tileSize/8,
-                        height: tileSize/2,
+                        width: tileSize / 8,
+                        height: tileSize / 2,
                         used: false,
                         piercing: false,
                         velocityX: Math.sin(spreadAngle) * 10,
@@ -2034,13 +2087,13 @@ function shoot(e) {
             });
         } else {
             // Bắn thường theo dạng quạt
-            for(let i = 0; i < permanentBulletCount; i++) {
-                let spreadAngle = (i - (permanentBulletCount-1)/2) * 0.15;
+            for (let i = 0; i < permanentBulletCount; i++) {
+                let spreadAngle = (i - (permanentBulletCount - 1) / 2) * 0.15;
                 let bullet = {
-                    x: ship.x + shipWidth * 15/32,
+                    x: ship.x + shipWidth * 15 / 32,
                     y: ship.y,
-                    width: tileSize/8,
-                    height: tileSize/2,
+                    width: tileSize / 8,
+                    height: tileSize / 2,
                     used: false,
                     piercing: false,
                     velocityX: Math.sin(spreadAngle) * 10,
@@ -2060,7 +2113,7 @@ function spawnBuff(x, y, forAI = false) {
     // Tăng tỉ lệ rơi vật phẩm tăng đạn
     let rand = Math.random();
     let type;
-    
+
     if (rand < 0.4) { // 40% cơ hội rơi vật phẩm tăng đạn
         type = "permanentBulletUp";
     } else {
@@ -2070,10 +2123,10 @@ function spawnBuff(x, y, forAI = false) {
             Object.keys(powerUpTypes).filter(t => t !== "permanentBulletUp");
         type = otherTypes[Math.floor(Math.random() * otherTypes.length)];
     }
-    
+
     if (forAI) {
         // Tạo buff cho AI
-        buffAI = { 
+        buffAI = {
             x: x,
             y: y,
             width: tileSize,
@@ -2084,7 +2137,7 @@ function spawnBuff(x, y, forAI = false) {
         buffAIExists = true;
     } else {
         // Tạo buff cho người chơi
-        buff = { 
+        buff = {
             x: x,
             y: y,
             width: tileSize,
@@ -2100,15 +2153,15 @@ function activateBuff(targetShip) {
     buffExists = false;
     buffActive = true;
     buffType = buff.type;
-    
+
     // Xác định xem đây là tàu người chơi hay AI
     const isPlayerShip = (targetShip === ship);
-    
+
     buff = null;
 
     let originalAlienVelocity = alienVelocityX; // Lưu tốc độ gốc của alien
 
-    switch(buffType) {
+    switch (buffType) {
         case "shield":
             if (isPlayerShip) {
                 isShieldActive = true;
@@ -2125,7 +2178,7 @@ function activateBuff(targetShip) {
                 }, powerUpTypes.shield.duration);
             }
             break;
-        
+
         case "rapidFire":
             let originalVelocity = bulletVelocityY;
             bulletVelocityY *= 2;
@@ -2134,7 +2187,7 @@ function activateBuff(targetShip) {
                 if (isPlayerShip) buffActive = false;
             }, powerUpTypes.rapidFire.duration);
             break;
-        
+
         case "piercingShot":
             if (isPlayerShip) {
                 bulletArray.forEach(bullet => bullet.piercing = true);
@@ -2149,7 +2202,7 @@ function activateBuff(targetShip) {
                 }, powerUpTypes.piercingShot.duration);
             }
             break;
-        
+
         case "multiShot":
             if (isPlayerShip) {
                 setTimeout(() => {
@@ -2157,7 +2210,7 @@ function activateBuff(targetShip) {
                 }, powerUpTypes.multiShot.duration);
             }
             break;
-        
+
         case "bomb":
             alienArray.forEach(alien => {
                 if (alien.alive) {
@@ -2179,7 +2232,7 @@ function activateBuff(targetShip) {
             });
             if (isPlayerShip) buffActive = false;
             break;
-        
+
         case "permanentBulletUp":
             if (isPlayerShip) {
                 permanentBulletCount++;
@@ -2188,7 +2241,7 @@ function activateBuff(targetShip) {
                 targetShip.bulletCount++;
             }
             break;
-        
+
         case "slowAliens":
             alienVelocityX *= 0.5; // Giảm một nửa tốc độ
             setTimeout(() => {
@@ -2203,10 +2256,10 @@ function activateAIBuff() {
     buffAIExists = false;
     buffAIActive = true;
     buffAIType = buffAI.type;
-    
+
     let originalAlienVelocity = alienVelocityX; // Lưu tốc độ gốc của alien
-    
-    switch(buffAIType) {
+
+    switch (buffAIType) {
         case "shield":
             aiShip.isShieldActive = true;
             aiShip.shield = 100;
@@ -2215,7 +2268,7 @@ function activateAIBuff() {
                 buffAIActive = false;
             }, powerUpAITypes.shield.duration);
             break;
-        
+
         case "rapidFire":
             aiShip.bulletSpeedMultiplier = 2;
             setTimeout(() => {
@@ -2223,7 +2276,7 @@ function activateAIBuff() {
                 buffAIActive = false;
             }, powerUpAITypes.rapidFire.duration);
             break;
-        
+
         case "piercingShot":
             aiBulletArray.forEach(bullet => bullet.piercing = true);
             setTimeout(() => {
@@ -2231,7 +2284,7 @@ function activateAIBuff() {
                 buffAIActive = false;
             }, powerUpAITypes.piercingShot.duration);
             break;
-        
+
         case "multiShot":
             aiShip.hasMultiShot = true;
             setTimeout(() => {
@@ -2239,7 +2292,7 @@ function activateAIBuff() {
                 buffAIActive = false;
             }, powerUpAITypes.multiShot.duration);
             break;
-        
+
         case "bomb":
             alienArray.forEach(alien => {
                 if (alien.alive) {
@@ -2256,12 +2309,12 @@ function activateAIBuff() {
             });
             buffAIActive = false;
             break;
-        
+
         case "permanentBulletUp":
             aiShip.bulletCount++;
             buffAIActive = false;
             break;
-        
+
         case "slowAliens":
             alienVelocityX *= 0.5; // Giảm một nửa tốc độ
             setTimeout(() => {
@@ -2270,22 +2323,22 @@ function activateAIBuff() {
             }, powerUpAITypes.slowAliens.duration);
             break;
     }
-    
+
     buffAI = null;
 }
 
 function updateAI() {
     const settings = difficultySettings[aiShip.difficulty];
-    
+
     // Di chuyển AI
     aiShip.shootCooldown--;
-    
+
     // AI tìm buff AI dựa theo độ khó
     if (buffAI && buffAIExists && aiShip.difficulty !== "easy") {
         // Chỉ ở mức độ medium và hard AI mới đi lấy buff
         // Ưu tiên đi lấy buff cao nhất
-        const targetX = buffAI.x + buffAI.width/2 - aiShip.width/2;
-        
+        const targetX = buffAI.x + buffAI.width / 2 - aiShip.width / 2;
+
         // Di chuyển tàu AI tới vị trí buff
         if (Math.abs(aiShip.x - targetX) > settings.moveSpeed) {
             if (aiShip.x < targetX) {
@@ -2293,24 +2346,24 @@ function updateAI() {
             } else {
                 aiShip.x -= settings.moveSpeed * 1.5;
             }
-            
+
             // Giới hạn không cho tàu đi ra ngoài màn hình
             aiShip.x = Math.max(0, Math.min(boardWidth - aiShip.width, aiShip.x));
-            
+
             // Nếu đang đi lấy buff, không thực hiện hành động khác
             return;
         }
     }
-    
+
     // Xử lý trường hợp đang đánh boss
     if (isBossFight && boss) {
         // Nhắm vào boss
-        const targetX = boss.x + boss.width/2 - aiShip.width/2;
-        
+        const targetX = boss.x + boss.width / 2 - aiShip.width / 2;
+
         // Thêm độ chính xác dựa trên độ khó
         const accuracy = settings.accuracy;
         const targetWithError = targetX + (Math.random() * 2 - 1) * (1 - accuracy) * 100;
-        
+
         // Di chuyển tàu AI
         if (Math.abs(aiShip.x - targetWithError) > settings.moveSpeed) {
             if (aiShip.x < targetWithError) {
@@ -2319,13 +2372,13 @@ function updateAI() {
                 aiShip.x -= settings.moveSpeed;
             }
         }
-        
+
         // Né tránh laser của boss
         avoidBossLasers(settings);
-        
+
         // Giới hạn không cho tàu đi ra ngoài màn hình
         aiShip.x = Math.max(0, Math.min(boardWidth - aiShip.width, aiShip.x));
-        
+
         // Bắn đạn vào boss nếu hết thời gian cooldown
         if (aiShip.shootCooldown <= 0 && Math.random() < settings.reactionTime) {
             aiShoot();
@@ -2336,26 +2389,26 @@ function updateAI() {
     else {
         // Tìm alien gần nhất để nhắm bắn
         let targetAlien = findBestTarget(settings);
-        
+
         if (targetAlien) {
-            let targetX = targetAlien.x + targetAlien.width/2 - aiShip.width/2;
-            
+            let targetX = targetAlien.x + targetAlien.width / 2 - aiShip.width / 2;
+
             // Dự đoán vị trí cho mức độ trung bình và khó
             if (settings.predictiveAiming) {
                 const bulletTravelTime = Math.abs(targetAlien.y - aiShip.y) / Math.abs(bulletVelocityY);
                 const predictedX = targetAlien.x + (alienVelocityX * bulletTravelTime);
-                targetX = predictedX + targetAlien.width/2 - aiShip.width/2;
-                
+                targetX = predictedX + targetAlien.width / 2 - aiShip.width / 2;
+
                 // Kiểm tra xem alien có đổi hướng không
                 if (predictedX + targetAlien.width >= boardWidth || predictedX <= 0) {
-                    targetX = targetAlien.x + targetAlien.width/2 - aiShip.width/2;
+                    targetX = targetAlien.x + targetAlien.width / 2 - aiShip.width / 2;
                 }
             }
-            
+
             // Thêm độ chính xác dựa trên độ khó
             const accuracy = settings.accuracy;
             const targetWithError = targetX + (Math.random() * 2 - 1) * (1 - accuracy) * 100;
-            
+
             // Di chuyển tàu AI
             if (Math.abs(aiShip.x - targetWithError) > settings.moveSpeed) {
                 if (aiShip.x < targetWithError) {
@@ -2364,10 +2417,10 @@ function updateAI() {
                     aiShip.x -= settings.moveSpeed;
                 }
             }
-            
+
             // Giới hạn không cho tàu đi ra ngoài màn hình
             aiShip.x = Math.max(0, Math.min(boardWidth - aiShip.width, aiShip.x));
-            
+
             // Bắn đạn nếu hết thời gian cooldown và có xác suất bắn dựa trên độ khó
             if (aiShip.shootCooldown <= 0 && Math.random() < settings.reactionTime) {
                 aiShoot();
@@ -2376,23 +2429,23 @@ function updateAI() {
         } else {
             // Nếu không có alien, di chuyển qua lại
             aiShip.x += settings.moveSpeed * aiShip.moveDirection;
-            
+
             // Đổi hướng nếu chạm biên
             if (aiShip.x <= 0 || aiShip.x + aiShip.width >= boardWidth) {
                 aiShip.moveDirection *= -1;
             }
         }
     }
-    
+
     // Né tránh đạn của alien (nhưng ưu tiên thấp hơn di chuyển lấy buff)
     if (aiShip.difficulty !== "easy") {
         for (let i = 0; i < alienBullets.length; i++) {
             let bullet = alienBullets[i];
             // Nếu đạn đang đi xuống và gần tàu AI
-            if (Math.abs(bullet.x - (aiShip.x + aiShip.width/2)) < aiShip.width && 
+            if (Math.abs(bullet.x - (aiShip.x + aiShip.width / 2)) < aiShip.width &&
                 bullet.y < aiShip.y && bullet.y > aiShip.y - 100) {
                 // Né sang trái hoặc phải tùy thuộc vào vị trí hiện tại
-                const dodgeDirection = (aiShip.x > boardWidth/2) ? -1 : 1;
+                const dodgeDirection = (aiShip.x > boardWidth / 2) ? -1 : 1;
                 aiShip.x += settings.moveSpeed * dodgeDirection; // Giảm tốc độ né tránh so với ban đầu
                 break;
             }
@@ -2403,71 +2456,71 @@ function updateAI() {
 function findBestTarget(settings) {
     let bestTarget = null;
     let bestScore = -Infinity;
-    
+
     for (let i = 0; i < alienArray.length; i++) {
         if (alienArray[i].alive) {
             const alien = alienArray[i];
             let score = 0;
-            
+
             // Tính điểm dựa trên khoảng cách
-            const dx = alien.x + alien.width/2 - (aiShip.x + aiShip.width/2);
+            const dx = alien.x + alien.width / 2 - (aiShip.x + aiShip.width / 2);
             const dy = alien.y - aiShip.y;
-            const distance = Math.sqrt(dx*dx + dy*dy);
+            const distance = Math.sqrt(dx * dx + dy * dy);
             score -= distance * 0.5; // Ưu tiên alien gần hơn
-            
+
             // Ưu tiên alien nguy hiểm (shooter) ở mức độ trung bình và khó
             if (settings.predictiveAiming && alien.type === alienTypes.shooter) {
                 score += 300;
             }
-            
+
             // Ưu tiên alien có nhiều máu ở mức độ khó
             if (settings.seekPowerUps && alien.health > 1) {
                 score += alien.health * 100;
             }
-            
+
             // Ưu tiên alien gần với buff (nếu có) ở mức độ khó
             if (settings.seekPowerUps && buff) {
                 const distanceToBuff = Math.sqrt(
-                    Math.pow(alien.x - buff.x, 2) + 
+                    Math.pow(alien.x - buff.x, 2) +
                     Math.pow(alien.y - buff.y, 2)
                 );
                 if (distanceToBuff < 200) {
                     score += (200 - distanceToBuff);
                 }
             }
-            
+
             if (score > bestScore) {
                 bestScore = score;
                 bestTarget = alien;
             }
         }
     }
-    
+
     return bestTarget;
 }
 
 function aiShoot() {
     if (!aiShip.active) return;
-    
+
     try {
         // Đảm bảo aiShip.bulletSpeedMultiplier có giá trị
         if (!aiShip.bulletSpeedMultiplier) aiShip.bulletSpeedMultiplier = 1;
-        
+
         // Đảm bảo aiShip.bulletCount có giá trị
         if (!aiShip.bulletCount || aiShip.bulletCount < 1) aiShip.bulletCount = 1;
-        
+
         if (aiShip.hasMultiShot) {
             // Khi có multiShot, bắn 3 hướng chính
             let angles = [-0.3, 0, 0.3];
             angles.forEach(mainAngle => {
                 // Với mỗi hướng chính, bắn số đạn theo aiShip.bulletCount
-                for(let i = 0; i < aiShip.bulletCount; i++) {
-                    let spreadAngle = mainAngle + (i - (aiShip.bulletCount-1)/2) * 0.15;
+                for (let i = 0; i < aiShip.bulletCount; i++) {
+                    let spreadAngle = mainAngle + (i - (aiShip.bulletCount - 1) / 2) * 0.15;
                     let bullet = {
-                        x: aiShip.x + aiShip.width/2,
+                        x: aiShip.x + aiShip.width / 2,
                         y: aiShip.y,
-                        width: tileSize/8,
-                        height: tileSize/2,
+                        width: tileSize / 8,
+                        height: tileSize / 2,
                         used: false,
                         piercing: false,
                         velocityX: Math.sin(spreadAngle) * 10,
@@ -2478,13 +2531,13 @@ function aiShoot() {
             });
         } else {
             // Bắn thường theo dạng quạt
-            for(let i = 0; i < aiShip.bulletCount; i++) {
-                let spreadAngle = (i - (aiShip.bulletCount-1)/2) * 0.15;
+            for (let i = 0; i < aiShip.bulletCount; i++) {
+                let spreadAngle = (i - (aiShip.bulletCount - 1) / 2) * 0.15;
                 let bullet = {
-                    x: aiShip.x + aiShip.width/2,
+                    x: aiShip.x + aiShip.width / 2,
                     y: aiShip.y,
-                    width: tileSize/8,
-                    height: tileSize/2,
+                    width: tileSize / 8,
+                    height: tileSize / 2,
                     used: false,
                     piercing: false,
                     velocityX: Math.sin(spreadAngle) * 10,
@@ -2499,7 +2552,7 @@ function aiShoot() {
 }
 
 function resetAiShip() {
-    aiShip.x = shipX + boardWidth/3;
+    aiShip.x = shipX + boardWidth / 3;
     aiShip.y = shipY;
     aiShip.lives = 3;
     aiShip.shield = 100;
@@ -2518,12 +2571,12 @@ function updateHighScores() {
             name: playerName,
             score: score
         };
-        
+
         // Kiểm tra xem bảng điểm cao có tồn tại không
         if (!Array.isArray(highScores)) {
             highScores = [];
         }
-        
+
         // Kiểm tra xem điểm số này đã có trong bảng xếp hạng chưa
         let isDuplicate = false;
         let playerIndex = -1;
@@ -2532,7 +2585,7 @@ function updateHighScores() {
             if (typeof highScores[i] !== 'object' || !highScores[i].name) {
                 continue;
             }
-            
+
             // Nếu cùng tên người chơi, lưu vị trí
             if (highScores[i].name === playerName) {
                 playerIndex = i;
@@ -2542,16 +2595,16 @@ function updateHighScores() {
                 }
             }
         }
-        
+
         // Nếu đã có tên người chơi nhưng điểm thấp hơn, cập nhật điểm mới
         if (playerIndex !== -1 && !isDuplicate) {
             highScores.splice(playerIndex, 1);
         }
-        
+
         // Nếu không trùng lặp, thêm điểm mới vào danh sách
         if (!isDuplicate) {
             highScores.push(newScore);
-            
+
             // Sắp xếp lại theo điểm số giảm dần
             highScores.sort((a, b) => {
                 if (!a || !b || typeof a.score !== 'number' || typeof b.score !== 'number') {
@@ -2559,12 +2612,12 @@ function updateHighScores() {
                 }
                 return b.score - a.score;
             });
-            
+
             // Chỉ giữ 5 điểm cao nhất
             if (highScores.length > 5) {
                 highScores = highScores.slice(0, 5);
             }
-            
+
             // Lưu vào localStorage
             try {
                 localStorage.setItem("highScores", JSON.stringify(highScores));
@@ -2615,7 +2668,7 @@ function showHighScoresScreen() {
     if (!Array.isArray(highScores)) {
         highScores = [];
     }
-    
+
     if (highScores.length === 0) {
         let noScores = document.createElement("p");
         noScores.textContent = "Chưa có điểm nào được ghi nhận.";
@@ -2626,7 +2679,7 @@ function showHighScoresScreen() {
         table.style.width = "100%";
         table.style.borderCollapse = "collapse";
         table.style.marginBottom = "20px";
-        
+
         // Tạo header
         let headerRow = document.createElement("tr");
         ["HẠNG", "TÊN", "ĐIỂM"].forEach(text => {
@@ -2637,37 +2690,37 @@ function showHighScoresScreen() {
             headerRow.appendChild(header);
         });
         table.appendChild(headerRow);
-        
+
         // Hiển thị top 5 điểm cao
         for (let i = 0; i < highScores.length; i++) {
             if (!highScores[i] || typeof highScores[i] !== 'object') continue;
-            
+
             let row = document.createElement("tr");
             row.style.backgroundColor = i % 2 === 0 ? "rgba(50, 50, 50, 0.5)" : "rgba(30, 30, 30, 0.5)";
-            
+
             // Cột Hạng
             let rankCell = document.createElement("td");
             rankCell.textContent = (i + 1);
             rankCell.style.padding = "8px";
             rankCell.style.textAlign = "center";
             row.appendChild(rankCell);
-            
+
             // Cột Tên
             let nameCell = document.createElement("td");
             nameCell.textContent = highScores[i].name || "Không tên";
             nameCell.style.padding = "8px";
             row.appendChild(nameCell);
-            
+
             // Cột Điểm
             let scoreCell = document.createElement("td");
             scoreCell.textContent = highScores[i].score || 0;
             scoreCell.style.padding = "8px";
             scoreCell.style.textAlign = "right";
             row.appendChild(scoreCell);
-            
+
             table.appendChild(row);
         }
-        
+
         dialog.appendChild(table);
     }
 
@@ -2686,7 +2739,7 @@ function showHighScoresScreen() {
     dialog.appendChild(backButton);
 
     // Thêm sự kiện
-    backButton.onclick = function() {
+    backButton.onclick = function () {
         document.body.removeChild(modalBackdrop);
         showPlayerNameDialog();
     };
@@ -2711,18 +2764,18 @@ function resetGame() {
     buffExists = false;
     buffActive = false;
     buffType = null;
-    
+
     buffAI = null;
     buffAIExists = false;
     buffAIActive = false;
     buffAIType = null;
-    
+
     alienColumns = 3;
     alienRows = 2;
     alienVelocityX = 0.5;
     ship.x = shipX;
     ship.y = shipY;
-    
+
     if (aiEnabled) {
         resetAiShip();
         aiShip.active = true;
@@ -2731,7 +2784,7 @@ function resetGame() {
     } else {
         aiShip.active = false;
     }
-    
+
     createAliens();
     level = 1;
     experiencePoints = 0;
@@ -2739,7 +2792,7 @@ function resetGame() {
     bulletVelocityY = -10;
     shieldRegenRate = 0.1;
     permanentBulletCount = 1;
-    
+
     // Reset Boss
     boss = null;
     bossHealth = bossMaxHealth;
@@ -2748,14 +2801,14 @@ function resetGame() {
     bossLaserCount = 2; // Reset lại số lượng laser ban đầu
     isBossFight = false;
     bossDefeated = false;
-    
+
     // Reset versusResult và các biến kết quả khác
     versusResult = null;
     singlePlayerResult = null;
 }
 
 //thêm event listener cho phím R để restart game
-document.addEventListener("keydown", function(e) {
+document.addEventListener("keydown", function (e) {
     if (e.code === "KeyR" && gameOver) {
         // Hiển thị hộp thoại nhập tên khi khởi động lại sau khi game over
         showPlayerNameDialog();
@@ -2773,20 +2826,20 @@ function levelUp() {
     level++;
     experiencePoints -= experienceToNextLevel;
     experienceToNextLevel *= 1.5;
-    
+
     // Tăng sức mạnh theo level
     bulletVelocityY -= 0.5;
     shieldRegenRate += 0.05;
-     
+
     // Hiệu ứng level up
     context.fillStyle = "yellow";
     context.font = "32px courier";
-    context.fillText("LEVEL UP!", boardWidth/2 - 80, boardHeight/2);
+    context.fillText("LEVEL UP!", boardWidth / 2 - 80, boardHeight / 2);
 }
 
 // Ngăn chặn hành vi mặc định của phím Space
-window.addEventListener("keydown", function(e) {
-    if(e.code === "Space") {
+window.addEventListener("keydown", function (e) {
+    if (e.code === "Space") {
         e.preventDefault();
     }
 });
@@ -2794,27 +2847,27 @@ window.addEventListener("keydown", function(e) {
 // Hàm khởi tạo boss fight
 function startBossFight() {
     console.log("Boss fight initialization started");
-    
+
     // Đặt cờ boss fight
     isBossFight = true;
-    
+
     // Xóa tất cả alien và đạn 
     alienArray = [];
     alienBullets = [];
     alienCount = 0;
-    
+
     // Tạo boss
     let bossImg = new Image();
     bossImg.src = "./boss.png";
-    
+
     // Xử lý sự kiện tải hình ảnh
-    bossImg.onload = function() {
+    bossImg.onload = function () {
         console.log("Boss image loaded successfully");
     };
-    
-    bossImg.onerror = function() {
+
+    bossImg.onerror = function () {
         console.error("Failed to load boss image");
-        
+
         // Tạo một canvas để vẽ boss thay thế
         let canvas = document.createElement('canvas');
         canvas.width = bossWidth;
@@ -2824,12 +2877,12 @@ function startBossFight() {
         ctx.fillRect(0, 0, bossWidth, bossHeight);
         ctx.fillStyle = 'white';
         ctx.font = '20px Arial';
-        ctx.fillText('BOSS', bossWidth/3, bossHeight/2);
-        
+        ctx.fillText('BOSS', bossWidth / 3, bossHeight / 2);
+
         // Chuyển canvas thành data URL
         bossImg.src = canvas.toDataURL();
     };
-    
+
     // Khởi tạo boss với các thuộc tính
     boss = {
         x: boardWidth / 2 - bossWidth / 2,
@@ -2838,36 +2891,36 @@ function startBossFight() {
         height: bossHeight,
         img: bossImg
     };
-    
+
     // Thiết lập các thuộc tính khác cho boss fight
     bossHealth = bossMaxHealth;
     bossLaserTimer = 0;
     bossLaserCount = 2;
     bossLasers = [];
-    
+
     // Tạo laser đầu tiên ngay lập tức
     setTimeout(createBossLasers, 2000);
-    
+
     console.log("Boss fight initialized:", boss);
 }
 
 // Tạo laser của boss - sửa để bắt đầu với 2 đường laser và tăng dần
 function createBossLasers() {
     console.log("Creating boss lasers");
-    
+
     if (!isBossFight || !boss) {
         console.log("Cannot create lasers - no active boss fight");
         return;
     }
-    
+
     // Xóa laser cũ
     bossLasers = [];
-    
+
     // Tạo laser mới dựa trên bossLaserCount
     for (let i = 0; i < bossLaserCount; i++) {
         // Phân bổ vị trí laser đều trên màn hình
         let laserX;
-        
+
         if (bossLaserCount > 1) {
             // Chia đều khoảng cách
             const totalWidth = boardWidth - bossLaserWidth;
@@ -2877,13 +2930,13 @@ function createBossLasers() {
             // Nếu chỉ có 1 laser, đặt ở giữa màn hình
             laserX = (boardWidth - bossLaserWidth) / 2;
         }
-        
+
         // Thêm một chút ngẫu nhiên
         laserX += (Math.random() - 0.5) * 30;
-        
+
         // Giới hạn trong màn hình
         laserX = Math.max(0, Math.min(boardWidth - bossLaserWidth, laserX));
-        
+
         // Tạo laser mới
         bossLasers.push({
             x: laserX,
@@ -2893,36 +2946,36 @@ function createBossLasers() {
             growing: true
         });
     }
-    
+
     // Tăng số lượng laser cho lần sau
     bossLaserCount = Math.min(bossLaserCount + 1, 10); // Tối đa 10 laser
-    
+
     // Hiệu ứng cảnh báo
     flashWarning();
-    
+
     console.log("Created", bossLasers.length, "boss lasers");
 }
 
 // Sửa lại hàm avoidBossLasers để xử lý đúng
 function avoidBossLasers(settings) {
     if (!aiShip.active || aiShip.difficulty === "easy") return;
-    
+
     // Kiểm tra xem bossLasers có tồn tại và không trống
     if (!bossLasers || bossLasers.length === 0) return;
-    
+
     // Né tránh laser ở độ khó medium và hard
     for (let i = 0; i < bossLasers.length; i++) {
         const laser = bossLasers[i];
         // Nếu laser sắp va chạm với AI (khoảng cách gần hơn)
-        const laserCenterX = laser.x + laser.width/2;
-        const shipCenterX = aiShip.x + aiShip.width/2;
+        const laserCenterX = laser.x + laser.width / 2;
+        const shipCenterX = aiShip.x + aiShip.width / 2;
         const distanceX = Math.abs(laserCenterX - shipCenterX);
-        
+
         if (distanceX < aiShip.width * 1.2) { // Tăng phạm vi né tránh
             // Di chuyển tránh xa laser
             const moveDirection = (laserCenterX > shipCenterX) ? -1 : 1;
             aiShip.x += settings.moveSpeed * 3 * moveDirection; // Tăng tốc độ né tránh
-            
+
             // Giới hạn không cho đi ra ngoài màn hình
             aiShip.x = Math.max(0, Math.min(boardWidth - aiShip.width, aiShip.x));
             console.log("AI avoiding laser at", laserCenterX, "moving", moveDirection > 0 ? "right" : "left");
@@ -2934,20 +2987,20 @@ function avoidBossLasers(settings) {
 // Sửa lại hàm updateBossLasers để hiển thị và hoạt động đúng
 function updateBossLasers() {
     if (!bossLasers || bossLasers.length === 0) return;
-    
+
     for (let i = bossLasers.length - 1; i >= 0; i--) {
         let laser = bossLasers[i];
-        
+
         // Kiểm tra xem laser có hợp lệ không
         if (!laser) {
             bossLasers.splice(i, 1);
             continue;
         }
-        
+
         // Nếu đang phát triển
         if (laser.growing) {
             laser.height += 10; // Tăng tốc độ phát triển
-            
+
             // Nếu laser đạt đến cuối màn hình
             if (laser.height >= boardHeight) {
                 // Giữ ở chiều cao tối đa trong một thời gian trước khi biến mất
@@ -2957,27 +3010,27 @@ function updateBossLasers() {
         } else {
             // Giảm thời gian tồn tại
             laser.duration--;
-            
+
             // Nếu hết thời gian, xóa laser
             if (laser.duration <= 0) {
                 bossLasers.splice(i, 1);
                 continue;
             }
         }
-        
+
         // Vẽ laser với hiệu ứng gradient
         let gradient = context.createLinearGradient(0, laser.y, 0, laser.y + laser.height);
         gradient.addColorStop(0, "rgba(255, 0, 0, 0.8)");
         gradient.addColorStop(0.5, "rgba(255, 255, 0, 0.9)");
         gradient.addColorStop(1, "rgba(255, 0, 0, 0.8)");
-        
+
         context.fillStyle = gradient;
         context.fillRect(laser.x, laser.y, laser.width, laser.height);
-        
+
         // Hiệu ứng phát sáng ở giữa
         context.fillStyle = "rgba(255, 255, 255, 0.8)";
-        context.fillRect(laser.x + laser.width/4, laser.y, laser.width/2, laser.height);
-        
+        context.fillRect(laser.x + laser.width / 4, laser.y, laser.width / 2, laser.height);
+
         // Kiểm tra va chạm với người chơi và AI
         if (ship && detectLaserCollision(laser, ship)) {
             if (isShieldActive) {
@@ -3006,7 +3059,7 @@ function updateBossLasers() {
                 }
             }
         }
-        
+
         if (aiEnabled && aiShip.active && detectLaserCollision(laser, aiShip)) {
             if (aiShip.isShieldActive) {
                 aiShip.shield -= 50;
@@ -3017,7 +3070,7 @@ function updateBossLasers() {
                 aiShip.lives--;
                 if (aiShip.lives <= 0) {
                     aiShip.active = false;
-                    
+
                     // Nếu AI bị tiêu diệt
                     if (lives > 0) {
                         // Người chơi vẫn còn sống, người chơi thắng
@@ -3048,15 +3101,15 @@ function drawBossHealthBar() {
     const barHeight = 15;
     const barX = (boardWidth - barWidth) / 2;
     const barY = 20;
-    
+
     // Vẽ nền của thanh máu
     context.fillStyle = "#333";
     context.fillRect(barX, barY, barWidth, barHeight);
-    
+
     // Vẽ máu hiện tại
     const healthPercent = bossHealth / bossMaxHealth;
     let healthColor;
-    
+
     if (healthPercent > 0.6) {
         healthColor = "#00ff00"; // Xanh lá khi máu > 60%
     } else if (healthPercent > 0.3) {
@@ -3064,41 +3117,41 @@ function drawBossHealthBar() {
     } else {
         healthColor = "#ff0000"; // Đỏ khi máu <= 30%
     }
-    
+
     context.fillStyle = healthColor;
     context.fillRect(barX, barY, barWidth * healthPercent, barHeight);
-    
+
     // Vẽ viền cho thanh máu
     context.strokeStyle = "white";
     context.lineWidth = 2;
     context.strokeRect(barX, barY, barWidth, barHeight);
-    
+
     // Hiển thị text BOSS và máu hiện tại
     context.fillStyle = "white";
     context.font = "bold 12px courier";
-    context.fillText("BOSS: " + bossHealth + "/" + bossMaxHealth, barX + barWidth/2 - 50, barY + barHeight - 2);
+    context.fillText("BOSS: " + bossHealth + "/" + bossMaxHealth, barX + barWidth / 2 - 50, barY + barHeight - 2);
 }
 
 // Tạo hiệu ứng nổ lớn khi boss bị tiêu diệt
 function createBossExplosion() {
     const explosionCount = 15;
-    
+
     // Tạo nhiều vụ nổ ở vị trí khác nhau trên boss
     for (let i = 0; i < explosionCount; i++) {
         setTimeout(() => {
             const offsetX = Math.random() * bossWidth;
             const offsetY = Math.random() * bossHeight;
-            
+
             explosions.push({
-                x: boss.x + offsetX - alienWidth/2,
-                y: boss.y + offsetY - alienHeight/2,
+                x: boss.x + offsetX - alienWidth / 2,
+                y: boss.y + offsetY - alienHeight / 2,
                 frame: 0,
                 duration: explosionDuration,
                 size: 1 + Math.random() * 2 // Kích thước ngẫu nhiên
             });
         }, i * 150); // Các vụ nổ xảy ra theo trình tự
     }
-    
+
     // Cũng xóa tất cả laser của boss
     bossLasers = [];
 }
@@ -3108,13 +3161,13 @@ function updateExplosions() {
     for (let i = explosions.length - 1; i >= 0; i--) {
         let explosion = explosions[i];
         let size = explosion.size || 1; // Default size là 1 nếu không được định nghĩa
-        
+
         context.fillStyle = "orange";
         context.beginPath();
         context.arc(
-            explosion.x + alienWidth/2,
-            explosion.y + alienHeight/2,
-            (explosion.frame / explosionFrames) * alienWidth/2 * size,
+            explosion.x + alienWidth / 2,
+            explosion.y + alienHeight / 2,
+            (explosion.frame / explosionFrames) * alienWidth / 2 * size,
             0,
             2 * Math.PI
         );
@@ -3143,58 +3196,58 @@ function loadAllBuffImages() {
         'permanentBulletUp',
         'slowAliens'
     ];
-    
+
     // Tải buff cho người chơi
     buffTypes.forEach(type => {
         const img = new Image();
         img.src = `./buffship/${type}.png`;
-        
-        img.onload = function() {
+
+        img.onload = function () {
             console.log(`Loaded player buff image: ${type}`);
             powerUpTypes[type].img = img;
         };
-        
-        img.onerror = function() {
+
+        img.onerror = function () {
             console.error(`Failed to load player buff image: ${type}`);
-            
+
             // Thử lại với tên file viết thường
             const retryImg = new Image();
             retryImg.src = `./buffship/${type.toLowerCase()}.png`;
-            
-            retryImg.onload = function() {
+
+            retryImg.onload = function () {
                 console.log(`Loaded player buff image (lowercase): ${type}`);
                 powerUpTypes[type].img = retryImg;
             };
-            
-            retryImg.onerror = function() {
+
+            retryImg.onerror = function () {
                 console.error(`Failed to load player buff image with all attempts: ${type}`);
             };
         };
     });
-    
+
     // Tải buff cho AI
     buffTypes.forEach(type => {
         const img = new Image();
         img.src = `./buffshipAI/${type}.png`;
-        
-        img.onload = function() {
+
+        img.onload = function () {
             console.log(`Loaded AI buff image: ${type}`);
             powerUpAITypes[type].img = img;
         };
-        
-        img.onerror = function() {
+
+        img.onerror = function () {
             console.error(`Failed to load AI buff image: ${type}`);
-            
+
             // Thử lại với tên file viết thường
             const retryImg = new Image();
             retryImg.src = `./buffshipAI/${type.toLowerCase()}.png`;
-            
-            retryImg.onload = function() {
+
+            retryImg.onload = function () {
                 console.log(`Loaded AI buff image (lowercase): ${type}`);
                 powerUpAITypes[type].img = retryImg;
             };
-            
-            retryImg.onerror = function() {
+
+            retryImg.onerror = function () {
                 console.error(`Failed to load AI buff image with all attempts: ${type}`);
             };
         };
