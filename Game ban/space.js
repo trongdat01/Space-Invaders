@@ -472,15 +472,15 @@ let difficultySettings = {
         accuracy: 0.9
     },
     medium: {
-        shootInterval: 30,
-        moveSpeed: 3,
+        shootInterval: 25,
+        moveSpeed: 4,
         reactionTime: 0.95,
         accuracy: 0.95,
         predictiveAiming: true
     },
     hard: {
-        shootInterval: 30,
-        moveSpeed: 4,
+        shootInterval: 20,
+        moveSpeed: 5,
         reactionTime: 1,
         accuracy: 1,
         predictiveAiming: true,
