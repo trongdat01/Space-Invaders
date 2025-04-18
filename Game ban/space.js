@@ -473,14 +473,14 @@ let difficultySettings = {
     },
     medium: {
         shootInterval: 25,
-        moveSpeed: 4,
+        moveSpeed: 3,
         reactionTime: 0.95,
         accuracy: 0.95,
         predictiveAiming: true
     },
     hard: {
         shootInterval: 20,
-        moveSpeed: 5,
+        moveSpeed: 4,
         reactionTime: 1,
         accuracy: 1,
         predictiveAiming: true,
@@ -630,6 +630,196 @@ function showPlayerNameDialog() {
 
 // Khởi tạo highScores
 let highScores = JSON.parse(localStorage.getItem("highScores")) || [];
+
+// Fix high scores screen display function
+function showHighScoresScreen() {
+    try {
+        // Tạo lớp phủ nền
+        let modalBackdrop = document.createElement("div");
+        modalBackdrop.id = "highscores-modal-backdrop";
+        modalBackdrop.style.position = "fixed";
+        modalBackdrop.style.top = "0";
+        modalBackdrop.style.left = "0";
+        modalBackdrop.style.width = "100%";
+        modalBackdrop.style.height = "100%";
+        modalBackdrop.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+        modalBackdrop.style.zIndex = "1001";
+        modalBackdrop.style.display = "flex";
+        modalBackdrop.style.justifyContent = "center";
+        modalBackdrop.style.alignItems = "center";
+
+        // Tạo hộp thoại
+        let dialog = document.createElement("div");
+        dialog.style.backgroundColor = "black";
+        dialog.style.border = "2px solid #f0c808"; // Màu vàng
+        dialog.style.padding = "20px";
+        dialog.style.borderRadius = "10px";
+        dialog.style.width = "400px";
+        dialog.style.fontFamily = "courier";
+        dialog.style.color = "white";
+        dialog.style.textAlign = "center";
+
+        // Tiêu đề
+        let title = document.createElement("h2");
+        title.textContent = "ĐIỂM CAO NHẤT";
+        title.style.color = "#f0c808";
+        title.style.marginBottom = "20px";
+        dialog.appendChild(title);
+
+        // Hiển thị danh sách điểm cao
+        console.log("High scores before displaying:", highScores);
+
+        // Đảm bảo highScores là một mảng hợp lệ
+        if (!Array.isArray(highScores)) {
+            console.log("High scores is not an array, initializing empty array");
+            highScores = [];
+        }
+
+        if (highScores.length === 0) {
+            let noScores = document.createElement("p");
+            noScores.textContent = "Chưa có điểm nào được ghi nhận.";
+            noScores.style.margin = "20px 0";
+            dialog.appendChild(noScores);
+        } else {
+            let table = document.createElement("table");
+            table.style.width = "100%";
+            table.style.borderCollapse = "collapse";
+            table.style.marginBottom = "20px";
+
+            // Tạo header
+            let headerRow = document.createElement("tr");
+            ["HẠNG", "TÊN", "ĐIỂM"].forEach(text => {
+                let header = document.createElement("th");
+                header.textContent = text;
+                header.style.padding = "8px";
+                header.style.borderBottom = "1px solid #f0c808";
+                headerRow.appendChild(header);
+            });
+            table.appendChild(headerRow);
+
+            // Hiển thị top 5 điểm cao
+            for (let i = 0; i < highScores.length; i++) {
+                if (!highScores[i] || typeof highScores[i] !== 'object') {
+                    console.log("Invalid score entry at index", i, ":", highScores[i]);
+                    continue;
+                }
+
+                let row = document.createElement("tr");
+                row.style.backgroundColor = i % 2 === 0 ? "rgba(50, 50, 50, 0.5)" : "rgba(30, 30, 30, 0.5)";
+
+                // Cột Hạng
+                let rankCell = document.createElement("td");
+                rankCell.textContent = (i + 1);
+                rankCell.style.padding = "8px";
+                rankCell.style.textAlign = "center";
+                row.appendChild(rankCell);
+
+                // Cột Tên
+                let nameCell = document.createElement("td");
+                nameCell.textContent = highScores[i].name || "Không tên";
+                nameCell.style.padding = "8px";
+                row.appendChild(nameCell);
+
+                // Cột Điểm
+                let scoreCell = document.createElement("td");
+                scoreCell.textContent = highScores[i].score || 0;
+                scoreCell.style.padding = "8px";
+                scoreCell.style.textAlign = "right";
+                row.appendChild(scoreCell);
+
+                table.appendChild(row);
+            }
+
+            dialog.appendChild(table);
+        }
+
+        // Container cho các nút
+        let buttonsContainer = document.createElement("div");
+        buttonsContainer.style.display = "flex";
+        buttonsContainer.style.justifyContent = "space-between";
+        buttonsContainer.style.gap = "15px";
+        buttonsContainer.style.marginTop = "10px";
+
+        // Nút Quay Lại
+        let backButton = document.createElement("button");
+        backButton.textContent = "QUAY LẠI";
+        backButton.style.backgroundColor = "#00bfff"; // Màu xanh dương
+        backButton.style.color = "black";
+        backButton.style.border = "none";
+        backButton.style.padding = "10px 0";
+        backButton.style.cursor = "pointer";
+        backButton.style.flex = "1";
+        backButton.style.fontFamily = "courier";
+        backButton.style.fontWeight = "bold";
+        backButton.style.borderRadius = "5px";
+
+        // Hiệu ứng hover cho nút Quay Lại
+        backButton.onmouseover = function () {
+            backButton.style.backgroundColor = "#0095dd";
+        };
+        backButton.onmouseout = function () {
+            backButton.style.backgroundColor = "#00bfff";
+        };
+
+        // Nút Đặt Lại
+        let resetButton = document.createElement("button");
+        resetButton.textContent = "ĐẶT LẠI";
+        resetButton.style.backgroundColor = "#ff4500"; // Màu cam đậm
+        resetButton.style.color = "white";
+        resetButton.style.border = "none";
+        resetButton.style.padding = "10px 0";
+        resetButton.style.cursor = "pointer";
+        resetButton.style.flex = "1";
+        resetButton.style.fontFamily = "courier";
+        resetButton.style.fontWeight = "bold";
+        resetButton.style.borderRadius = "5px";
+
+        // Hiệu ứng hover cho nút Đặt Lại
+        resetButton.onmouseover = function () {
+            resetButton.style.backgroundColor = "#cc3700";
+        };
+        resetButton.onmouseout = function () {
+            resetButton.style.backgroundColor = "#ff4500";
+        };
+
+        // Thêm sự kiện cho nút Quay Lại
+        backButton.onclick = function () {
+            document.body.removeChild(modalBackdrop);
+            showPlayerNameDialog();
+        };
+
+        // Thêm sự kiện cho nút Đặt Lại
+        resetButton.onclick = function () {
+            showConfirmDialog("Bạn có chắc chắn muốn đặt lại tất cả điểm cao nhất không?", function () {
+                // Xóa tất cả điểm cao
+                highScores = [];
+                localStorage.removeItem("highScores");
+                console.log("Đã đặt lại tất cả điểm cao");
+
+                // Hiển thị lại màn hình điểm cao
+                document.body.removeChild(modalBackdrop);
+                showHighScoresScreen();
+            });
+        };
+
+        // Thêm các nút vào container
+        buttonsContainer.appendChild(backButton);
+        buttonsContainer.appendChild(resetButton);
+
+        // Thêm container vào dialog
+        dialog.appendChild(buttonsContainer);
+
+        // Thêm vào DOM
+        modalBackdrop.appendChild(dialog);
+        document.body.appendChild(modalBackdrop);
+        console.log("High scores screen displayed successfully");
+    } catch (error) {
+        console.error("Error displaying high scores:", error);
+        // Fallback khi có lỗi hiển thị
+        alert("Không thể hiển thị điểm cao. Lỗi: " + error.message);
+        showPlayerNameDialog(); // Quay lại màn hình nhập tên
+    }
+}
 
 function createStars() {
     for (let i = 0; i < 200; i++) {
@@ -1110,6 +1300,115 @@ function flashWarning() {
     }
 }
 
+// Thêm function hiển thị hộp thoại xác nhận tùy chỉnh
+function showConfirmDialog(message, onConfirm, onCancel) {
+    // Tạo lớp phủ nền
+    let modalBackdrop = document.createElement("div");
+    modalBackdrop.id = "confirm-modal-backdrop";
+    modalBackdrop.style.position = "fixed";
+    modalBackdrop.style.top = "0";
+    modalBackdrop.style.left = "0";
+    modalBackdrop.style.width = "100%";
+    modalBackdrop.style.height = "100%";
+    modalBackdrop.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
+    modalBackdrop.style.zIndex = "1001";
+    modalBackdrop.style.display = "flex";
+    modalBackdrop.style.justifyContent = "center";
+    modalBackdrop.style.alignItems = "center";
+
+    // Tạo hộp thoại
+    let dialog = document.createElement("div");
+    dialog.style.backgroundColor = "black";
+    dialog.style.border = "2px solid #ff4500"; // Màu cam đậm giống nút restart
+    dialog.style.padding = "20px";
+    dialog.style.borderRadius = "10px";
+    dialog.style.width = "350px";
+    dialog.style.fontFamily = "courier";
+    dialog.style.color = "white";
+    dialog.style.textAlign = "center";
+    dialog.style.boxShadow = "0 0 20px rgba(255, 69, 0, 0.4)";
+
+    // Biểu tượng cảnh báo
+    let warningIcon = document.createElement("div");
+    warningIcon.innerHTML = "⚠️";
+    warningIcon.style.fontSize = "40px";
+    warningIcon.style.marginBottom = "15px";
+    dialog.appendChild(warningIcon);
+
+    // Thông điệp xác nhận
+    let messageElement = document.createElement("p");
+    messageElement.textContent = message;
+    messageElement.style.fontSize = "18px";
+    messageElement.style.marginBottom = "20px";
+    dialog.appendChild(messageElement);
+
+    // Container cho các nút
+    let buttonContainer = document.createElement("div");
+    buttonContainer.style.display = "flex";
+    buttonContainer.style.justifyContent = "space-between";
+    buttonContainer.style.gap = "15px";
+
+    // Nút "Có"
+    let confirmButton = document.createElement("button");
+    confirmButton.textContent = "Có";
+    confirmButton.style.flex = "1";
+    confirmButton.style.backgroundColor = "#4CAF50"; // Màu xanh lá
+    confirmButton.style.color = "white";
+    confirmButton.style.border = "none";
+    confirmButton.style.padding = "10px 15px";
+    confirmButton.style.borderRadius = "5px";
+    confirmButton.style.cursor = "pointer";
+    confirmButton.style.fontFamily = "courier";
+    confirmButton.style.fontWeight = "bold";
+    confirmButton.style.fontSize = "16px";
+
+    // Hiệu ứng hover cho nút Có
+    confirmButton.onmouseover = function () {
+        confirmButton.style.backgroundColor = "#45a049";
+    };
+    confirmButton.onmouseout = function () {
+        confirmButton.style.backgroundColor = "#4CAF50";
+    };
+
+    confirmButton.onclick = function () {
+        document.body.removeChild(modalBackdrop);
+        if (onConfirm) onConfirm();
+    };
+    buttonContainer.appendChild(confirmButton);
+
+    // Nút "Không"
+    let cancelButton = document.createElement("button");
+    cancelButton.textContent = "Không";
+    cancelButton.style.flex = "1";
+    cancelButton.style.backgroundColor = "#f44336"; // Màu đỏ
+    cancelButton.style.color = "white";
+    cancelButton.style.border = "none";
+    cancelButton.style.padding = "10px 15px";
+    cancelButton.style.borderRadius = "5px";
+    cancelButton.style.cursor = "pointer";
+    cancelButton.style.fontFamily = "courier";
+    cancelButton.style.fontWeight = "bold";
+    cancelButton.style.fontSize = "16px";
+
+    // Hiệu ứng hover cho nút Không
+    cancelButton.onmouseover = function () {
+        cancelButton.style.backgroundColor = "#da190b";
+    };
+    cancelButton.onmouseout = function () {
+        cancelButton.style.backgroundColor = "#f44336";
+    };
+
+    cancelButton.onclick = function () {
+        document.body.removeChild(modalBackdrop);
+        if (onCancel) onCancel();
+    };
+    buttonContainer.appendChild(cancelButton);
+
+    dialog.appendChild(buttonContainer);
+    modalBackdrop.appendChild(dialog);
+    document.body.appendChild(modalBackdrop);
+}
+
 window.onload = function () {
     try {
         board = document.getElementById("board");
@@ -1160,42 +1459,58 @@ window.onload = function () {
         createAliens();
         setupGameMenu();
 
-        // Tải điểm cao từ localStorage một cách an toàn
+        // Tải điểm cao từ localStorage một cách an toàn và kỹ lưỡng
         try {
+            console.log("Attempting to load high scores from localStorage");
             const savedScores = localStorage.getItem("highScores");
             if (savedScores) {
-                highScores = JSON.parse(savedScores);
+                console.log("Raw saved scores:", savedScores);
+                try {
+                    highScores = JSON.parse(savedScores);
+                    console.log("Parsed high scores:", highScores);
 
-                // Kiểm tra xem highScores có phải là một mảng hay không
-                if (!Array.isArray(highScores)) {
+                    // Kiểm tra xem highScores có phải là một mảng hay không
+                    if (!Array.isArray(highScores)) {
+                        console.warn("Loaded high scores is not an array, resetting to empty array");
+                        highScores = [];
+                    }
+
+                    // Chuyển đổi định dạng cũ (chỉ số điểm) sang định dạng mới (đối tượng với tên và điểm)
+                    highScores = highScores.map(item => {
+                        if (typeof item === "number") {
+                            return { name: "Không tên", score: item };
+                        } else if (typeof item === "object" && item !== null) {
+                            return item;
+                        } else {
+                            return { name: "Không tên", score: 0 };
+                        }
+                    });
+
+                    // Lọc ra các bản ghi không hợp lệ
+                    highScores = highScores.filter(item =>
+                        item && typeof item === "object" && typeof item.score === "number"
+                    );
+
+                    // Sắp xếp lại theo điểm số giảm dần
+                    highScores.sort((a, b) => b.score - a.score);
+
+                    console.log("Processed high scores:", highScores);
+                } catch (parseError) {
+                    console.error("Error parsing high scores:", parseError);
                     highScores = [];
                 }
-
-                // Chuyển đổi định dạng cũ (chỉ số điểm) sang định dạng mới (đối tượng với tên và điểm)
-                highScores = highScores.map(item => {
-                    if (typeof item === "number") {
-                        return { name: "Không tên", score: item };
-                    } else if (typeof item === "object" && item !== null) {
-                        return item;
-                    } else {
-                        return { name: "Không tên", score: 0 };
-                    }
-                });
-
-                // Lọc ra các bản ghi không hợp lệ
-                highScores = highScores.filter(item =>
-                    item && typeof item === "object" && typeof item.score === "number"
-                );
-
-                // Sắp xếp lại theo điểm số giảm dần
-                highScores.sort((a, b) => b.score - a.score);
-
-                console.log("Đã tải điểm cao:", highScores);
             } else {
+                console.log("No saved high scores found");
+                highScores = [];
+            }
+
+            // Khởi tạo với mảng rỗng nếu không tồn tại
+            if (!highScores) {
+                console.log("High scores is null/undefined, initializing empty array");
                 highScores = [];
             }
         } catch (e) {
-            console.error("Lỗi khi tải điểm cao:", e);
+            console.error("Error loading high scores:", e);
             highScores = [];
         }
 
@@ -1233,10 +1548,10 @@ window.onload = function () {
 // Thêm event listener cho phím Enter để bắt đầu lại game giống với nút "Bắt đầu lại"
 window.addEventListener("keydown", function (e) {
     if (e.key === "Enter" && (gameOver || bossDefeated || versusResult)) {
-        // Hiển thị hộp thoại xác nhận
-        if (confirm("Bạn có chắc muốn bắt đầu lại trò chơi? Điểm hiện tại sẽ bị mất.")) {
+        // Thay thế confirm bằng hộp thoại tùy chỉnh
+        showConfirmDialog("Bạn có chắc chắn muốn bắt đầu lại trò chơi?", function () {
             showPlayerNameDialog();
-        }
+        });
     }
 });
 
@@ -1359,10 +1674,10 @@ function setupGameMenu() {
 
     // Thêm sự kiện click
     restartGameButton.addEventListener("click", function () {
-        // Hiển thị hộp thoại xác nhận
-        if (confirm("Bạn có chắc muốn bắt đầu lại trò chơi? Điểm hiện tại sẽ bị mất.")) {
+        // Thay thế confirm bằng hộp thoại tùy chỉnh
+        showConfirmDialog("Bạn có chắc chắn muốn bắt đầu lại trò chơi?", function () {
             showPlayerNameDialog();
-        }
+        });
     });
     menuDiv.appendChild(restartGameButton);
 
@@ -1639,7 +1954,6 @@ function update() {
                 gameOver = true;
                 singlePlayerResult = "lose";
             }
-            updateHighScores();
         }
     }
 
@@ -2563,8 +2877,20 @@ function resetAiShip() {
     aiShip.moveDirection = 1;
 }
 
-// Sửa lại hàm updateHighScores để cập nhật đúng điểm cao
+// Sửa lại hàm updateHighScores để chỉ cập nhật khi game kết thúc
 function updateHighScores() {
+    // Chỉ cập nhật điểm cao khi game thực sự kết thúc
+    // Kiểm tra nếu một trong các điều kiện kết thúc game được đáp ứng
+    if (!(gameOver || bossDefeated || versusResult)) {
+        return; // Không làm gì nếu game chưa kết thúc
+    }
+
+    // Thêm biến tĩnh để đảm bảo hàm chỉ chạy một lần mỗi lần game kết thúc
+    if (updateHighScores.hasRun) {
+        return;
+    }
+    updateHighScores.hasRun = true;
+
     if (score > 0) {
         // Tạo điểm số mới với tên người chơi
         let newScore = {
@@ -2629,126 +2955,7 @@ function updateHighScores() {
     }
 }
 
-// Thêm hàm showHighScoresScreen nếu chưa tồn tại
-function showHighScoresScreen() {
-    // Tạo lớp phủ nền
-    let modalBackdrop = document.createElement("div");
-    modalBackdrop.id = "highscores-modal-backdrop";
-    modalBackdrop.style.position = "fixed";
-    modalBackdrop.style.top = "0";
-    modalBackdrop.style.left = "0";
-    modalBackdrop.style.width = "100%";
-    modalBackdrop.style.height = "100%";
-    modalBackdrop.style.backgroundColor = "rgba(0, 0, 0, 0.7)";
-    modalBackdrop.style.zIndex = "1001";
-    modalBackdrop.style.display = "flex";
-    modalBackdrop.style.justifyContent = "center";
-    modalBackdrop.style.alignItems = "center";
-
-    // Tạo hộp thoại
-    let dialog = document.createElement("div");
-    dialog.style.backgroundColor = "black";
-    dialog.style.border = "2px solid #f0c808"; // Màu vàng
-    dialog.style.padding = "20px";
-    dialog.style.borderRadius = "10px";
-    dialog.style.width = "400px";
-    dialog.style.fontFamily = "courier";
-    dialog.style.color = "white";
-    dialog.style.textAlign = "center";
-
-    // Tiêu đề
-    let title = document.createElement("h2");
-    title.textContent = "ĐIỂM CAO NHẤT";
-    title.style.color = "#f0c808";
-    title.style.marginBottom = "20px";
-    dialog.appendChild(title);
-
-    // Hiển thị danh sách điểm cao
-    // Đảm bảo highScores là một mảng hợp lệ
-    if (!Array.isArray(highScores)) {
-        highScores = [];
-    }
-
-    if (highScores.length === 0) {
-        let noScores = document.createElement("p");
-        noScores.textContent = "Chưa có điểm nào được ghi nhận.";
-        noScores.style.margin = "20px 0";
-        dialog.appendChild(noScores);
-    } else {
-        let table = document.createElement("table");
-        table.style.width = "100%";
-        table.style.borderCollapse = "collapse";
-        table.style.marginBottom = "20px";
-
-        // Tạo header
-        let headerRow = document.createElement("tr");
-        ["HẠNG", "TÊN", "ĐIỂM"].forEach(text => {
-            let header = document.createElement("th");
-            header.textContent = text;
-            header.style.padding = "8px";
-            header.style.borderBottom = "1px solid #f0c808";
-            headerRow.appendChild(header);
-        });
-        table.appendChild(headerRow);
-
-        // Hiển thị top 5 điểm cao
-        for (let i = 0; i < highScores.length; i++) {
-            if (!highScores[i] || typeof highScores[i] !== 'object') continue;
-
-            let row = document.createElement("tr");
-            row.style.backgroundColor = i % 2 === 0 ? "rgba(50, 50, 50, 0.5)" : "rgba(30, 30, 30, 0.5)";
-
-            // Cột Hạng
-            let rankCell = document.createElement("td");
-            rankCell.textContent = (i + 1);
-            rankCell.style.padding = "8px";
-            rankCell.style.textAlign = "center";
-            row.appendChild(rankCell);
-
-            // Cột Tên
-            let nameCell = document.createElement("td");
-            nameCell.textContent = highScores[i].name || "Không tên";
-            nameCell.style.padding = "8px";
-            row.appendChild(nameCell);
-
-            // Cột Điểm
-            let scoreCell = document.createElement("td");
-            scoreCell.textContent = highScores[i].score || 0;
-            scoreCell.style.padding = "8px";
-            scoreCell.style.textAlign = "right";
-            row.appendChild(scoreCell);
-
-            table.appendChild(row);
-        }
-
-        dialog.appendChild(table);
-    }
-
-    // Nút Quay Lại
-    let backButton = document.createElement("button");
-    backButton.textContent = "QUAY LẠI";
-    backButton.style.backgroundColor = "#00bfff"; // Màu xanh dương
-    backButton.style.color = "black";
-    backButton.style.border = "none";
-    backButton.style.padding = "10px 20px";
-    backButton.style.marginTop = "10px";
-    backButton.style.cursor = "pointer";
-    backButton.style.width = "90%";
-    backButton.style.fontFamily = "courier";
-    backButton.style.fontWeight = "bold";
-    dialog.appendChild(backButton);
-
-    // Thêm sự kiện
-    backButton.onclick = function () {
-        document.body.removeChild(modalBackdrop);
-        showPlayerNameDialog();
-    };
-
-    // Thêm vào DOM
-    modalBackdrop.appendChild(dialog);
-    document.body.appendChild(modalBackdrop);
-}
-
+// Sửa lại hàm resetGame để reset trạng thái cập nhật điểm cao
 function resetGame() {
     lives = 3;
     shield = 100;
@@ -2801,6 +3008,9 @@ function resetGame() {
     bossLaserCount = 2; // Reset lại số lượng laser ban đầu
     isBossFight = false;
     bossDefeated = false;
+
+    // Reset biến trạng thái của hàm updateHighScores
+    updateHighScores.hasRun = false;
 
     // Reset versusResult và các biến kết quả khác
     versusResult = null;
